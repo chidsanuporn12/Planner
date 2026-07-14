@@ -354,6 +354,12 @@
       <label id="gcalAutoWrap" style="display:none;font-size:13px;color:var(--ink-soft)"><input type="checkbox" id="gcalAuto" style="vertical-align:middle"> auto-sync when I edit</label>
       <span class="gcal-status" id="gcalStatus" style="font-size:12px;color:var(--ink-soft)"></span>
     </div>
+    <div class="backup-bar" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px">
+      <button class="link" id="dataExport" title="Save all your planner data (goals, projects, streaks, history) to a file">⬇ Back up my data</button>
+      <button class="link" id="dataImport" title="Load your data from a backup file">⬆ Restore from backup</button>
+      <input type="file" id="dataImportFile" accept="application/json,.json" style="display:none">
+      <span id="backupStatus" style="font-size:12px;color:var(--ink-soft)"></span>
+    </div>
   </header>
 
   <!-- ============ TODAY ============ -->
@@ -753,7 +759,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:"mon-push", type:"gym", checkable:true, label:"🏋 Gym — Push", sub:"chest·shoulders·triceps", split:"Push", start:"18:00", end:"19:30" },
         { id:"mon-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"22:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
+        { id:"mon-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:2, tag:"pull night · cardio after lifting", segments:[
         { id:"tue-eng", type:"lang", checkable:true, label:"English", sub:"listening", start:"05:40", end:"05:55" },
@@ -763,7 +771,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:"tue-pull", type:"gym", checkable:true, label:"🏋 Gym — Pull", sub:"back·biceps", split:"Pull", start:"18:00", end:"19:30" },
         { id:"tue-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"22:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
+        { id:"tue-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:3, tag:"legs night · cardio after lifting", segments:[
         { id:"wed-eng", type:"lang", checkable:true, label:"English", sub:"10–15 min", start:"05:40", end:"05:55" },
@@ -773,7 +783,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:"wed-legs", type:"gym", checkable:true, label:"🏋 Gym — Legs", sub:"squat·hinge·calves", split:"Legs", start:"18:00", end:"19:30" },
         { id:"wed-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"22:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
+        { id:"wed-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:4, tag:"chest & back night · cardio after lifting", segments:[
         { id:"thu-eng", type:"lang", checkable:true, label:"English", sub:"listening", start:"05:40", end:"05:55" },
@@ -783,7 +795,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:"thu-chestback", type:"gym", checkable:true, label:"🏋 Gym — Chest & Back", sub:"chest·back", split:"Chest and Back", start:"18:00", end:"19:30" },
         { id:"thu-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"22:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
+        { id:"thu-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:5, tag:"arms & shoulders night · cardio after lifting", segments:[
         { id:"fri-eng", type:"lang", checkable:true, label:"English", sub:"10–15 min", start:"05:40", end:"05:55" },
@@ -793,7 +807,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:"fri-armshoulders", type:"gym", checkable:true, label:"🏋 Gym — Arms & Shoulders", sub:"biceps·triceps·delts", split:"Arms and Shoulders", start:"18:00", end:"19:30" },
         { id:"fri-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"this one's for you", evening:true, start:"20:10", end:"22:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner", sub:"", evening:true, start:"20:10", end:"20:45" },
+        { id:"fri-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"this one's for you", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:6, tag:"heavy work day — no lifting, morning cardio stays", segments:[
         { id:"sat-cardio", type:"cardio", checkable:true, label:"☀ Rope jump", sub:"quick · optional", start:"05:00", end:"05:18" },
@@ -801,7 +817,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Drive", sub:"7:00–8:00", start:"06:00", end:"07:00" },
         { id:uid(), type:"work-heavy", checkable:false, label:"Work · 8:00–18:00", sub:"(tight day — protect this)", start:"07:00", end:"17:00" },
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"recovery comes first", start:"18:00", end:"21:00" }
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, recover", sub:"recovery comes first", start:"18:00", end:"19:30" },
+        { id:"sat-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"19:30", end:"20:15" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"", start:"20:15", end:"21:00" }
       ]},
       { dow:0, tag:"your only fully free day · morning cardio stays", segments:[
         { id:"sun-cardio", type:"cardio", checkable:true, label:"☀ Run + rope jump", sub:"optional · follow your body", start:"05:00", end:"06:30" },
@@ -809,8 +827,9 @@
         { id:uid(), type:"routine", checkable:false, label:"Breakfast, morning", sub:"", start:"07:00", end:"09:00" },
         { id:uid(), type:"routine", checkable:false, label:"Meal prep for the week", sub:"", start:"09:00", end:"12:00" },
         { id:uid(), type:"flex", checkable:false, label:"Free time — yours", sub:"", evening:true, start:"12:00", end:"17:00" },
-        { id:uid(), type:"routine", checkable:false, label:"Plan next week", sub:"(~15 min) + relax", start:"17:00", end:"19:00" },
-        { id:uid(), type:"flex", checkable:false, label:"Evening wind-down", sub:"early-ish to bed", start:"19:00", end:"22:00" }
+        { id:uid(), type:"routine", checkable:false, label:"Plan next week", sub:"(~15 min) + dinner", start:"17:00", end:"19:00" },
+        { id:"sun-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"19:00", end:"19:45" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening wind-down", sub:"early-ish to bed", start:"19:45", end:"22:00" }
       ]}
     ]};
   }
@@ -1580,6 +1599,46 @@
         if(gcalAuto && gcalConnected) gcalOnScheduleSaved();
       });
     }
+  })();
+
+  /* ===== BACKUP / RESTORE =====
+     Planner data is stored in localStorage, which is scoped per site address.
+     So opening from the Desktop file (file://) vs GitHub Pages (https://…) gives
+     two separate stores. Export bundles every yourweek:* key to a JSON file;
+     Import writes them back — how you migrate your data between the two. */
+  (function backupWire(){
+    var exp=document.getElementById("dataExport"),
+        imp=document.getElementById("dataImport"),
+        file=document.getElementById("dataImportFile"),
+        st=document.getElementById("backupStatus");
+    if(!exp) return;
+    function say(m){ if(st) st.textContent=m||""; }
+    exp.addEventListener("click", function(){
+      var data={};
+      for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k && k.indexOf("yourweek:")===0) data[k]=localStorage.getItem(k); }
+      var blob=new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="yourweek-backup-"+new Date().toISOString().slice(0,10)+".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      say("✓ Backed up "+Object.keys(data).length+" items — keep this file safe.");
+    });
+    imp.addEventListener("click", function(){ file.click(); });
+    file.addEventListener("change", function(){
+      var f=file.files[0]; if(!f) return;
+      var r=new FileReader();
+      r.onload=function(){
+        try{
+          var data=JSON.parse(r.result);
+          var n=0;
+          Object.keys(data).forEach(function(k){ if(k.indexOf("yourweek:")===0){ localStorage.setItem(k, data[k]); n++; } });
+          if(!n){ say("⚠ That file had no planner data in it."); return; }
+          say("✓ Restored "+n+" items — reloading…");
+          setTimeout(function(){ location.reload(); }, 700);
+        }catch(e){ say("⚠ That didn't look like a backup file."); }
+      };
+      r.readAsText(f);
+    });
   })();
 
   if(todayEl) todayEl.classList.add("today");
