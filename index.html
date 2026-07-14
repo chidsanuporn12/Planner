@@ -1528,6 +1528,7 @@
     var current = {}, todo = [];
     schedule.days.forEach(function(d){
       d.segments.forEach(function(seg){
+        if(!seg.checkable) return;   // only sync check-list tasks (gym, cardio, English, Chinese)
         current[seg.id] = true;
         var body = gcalSegEvent(d.dow, seg);
         if(existing[seg.id]) todo.push({ op:"update", id:existing[seg.id], body:body });
