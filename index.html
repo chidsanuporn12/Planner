@@ -8,23 +8,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #222a3c;
-    --bg-card: #2c3650;
-    --ink: #f3ede1;
-    --ink-soft: #b9c0d4;
-    --work: #6b89a8;
-    --work-heavy: #51698c;
-    --gym: #8fa888;
-    --cardio: #d68f6a;
-    --lang: #d4a24e;
-    --routine: #aab2c8;
-    --flex-bg: #3a4360;
-    --flex-border: #707ba0;
-    --rule: rgba(243,237,225,0.12);
-    --accent: #d4a24e;
-    --crit: #d98064;
-    --warn: #d4a24e;
-    --calm: #8fa888;
+    /* ---- graphite ---- */
+    --bg: #0E0F11;          /* page */
+    --bg-card: #16181C;     /* card surface */
+    --bg-raise: #1E2126;    /* inputs, bar tracks, wells */
+    --bg-hover: #252A31;
+    --ink: #E8EAED;
+    --ink-soft: #8B9099;
+    --ink-faint: #61666E;
+    --rule: #262A31;
+    --on-accent: #0E0F11;   /* dark text sitting on a light or accent fill */
+
+    /* ---- activity hues, tuned for a near-black ground ---- */
+    --work: #5E82AB;
+    --work-heavy: #46617F;
+    --gym: #7FB069;
+    --cardio: #E08A5B;
+    --lang: #D9A441;
+    --routine: #4A4F58;
+    --flex-bg: #16181C;
+    --flex-border: #333941;
+
+    --accent: #D9A441;
+    --crit: #E2685A;
+    --warn: #D9A441;
+    --calm: #7FB069;
   }
 
   *{ box-sizing: border-box; }
@@ -39,11 +47,43 @@
 
   .page{ max-width: 1000px; margin: 0 auto; padding: 48px 24px 64px; }
 
-  .dawn-bar{
-    height: 6px; border-radius: 4px;
-    background: linear-gradient(90deg, #4a5b86 0%, #8fa888 35%, #d4a24e 70%, #f3ede1 100%);
-    margin-bottom: 28px; opacity: 0.85;
+  /* ---------- GENERATIVE BACKGROUND ---------- */
+  #bgCanvas{
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none; display: block;
   }
+  .page{ position: relative; z-index: 1; }
+
+  /* ---------- DAILY BANNER (replaces the old dawn bar) ---------- */
+  .daybar{
+    position: relative; height: 46px; margin-bottom: 26px;
+    border: 1px solid var(--rule); border-radius:8px; overflow: hidden;
+    background: var(--bg-card);
+  }
+  .daybar canvas{ display:block; width:100%; height:100%; }
+  .daybar .db-cap{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    font-size:10.5px; letter-spacing:.9px; text-transform:uppercase;
+    color:var(--ink-soft); font-weight:600; pointer-events:none;
+    background:linear-gradient(90deg, transparent, var(--bg-card) 38%); padding:4px 0 4px 26px;
+  }
+  .daybar .db-cap b{ color:var(--ink); }
+
+  /* ---------- CONSISTENCY PANEL ---------- */
+  .consist{ background:var(--bg-card); border:1px solid var(--rule); border-radius:9px; padding:18px 20px; margin-bottom:36px; }
+  .consist h5{ margin:0 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-soft); font-weight:600; }
+  .consist .cn-sub{ font-size:11.5px; color:var(--ink-faint); margin:0 0 14px; }
+  .cn-year{ width:100%; height:auto; display:block; margin-bottom:6px; }
+  .cn-scale{ display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--ink-faint); justify-content:flex-end; margin-bottom:20px; }
+  .cn-scale i{ width:11px; height:11px; border-radius:2px; display:block; }
+  .cn-sparks{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; border-top:1px solid var(--rule); padding-top:16px; }
+  .cn-spark{ display:flex; flex-direction:column; gap:5px; }
+  .cn-spark .sp-top{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .cn-spark .sp-name{ font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--ink-soft); font-weight:600; }
+  .cn-spark .sp-val{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; }
+  .cn-spark .sp-val small{ font-family:'Inter',sans-serif; font-size:10.5px; font-weight:500; color:var(--ink-faint); margin-left:3px; letter-spacing:.3px; }
+  .cn-spark svg{ display:block; width:100%; height:38px; }
+  .cn-empty{ color:var(--ink-faint); font-size:12.5px; font-style:italic; padding:8px 2px; line-height:1.6; }
 
   header h1{
     font-family: 'Fraunces', serif; font-weight: 600;
@@ -63,10 +103,10 @@
 
   /* ---------- TODAY CARD ---------- */
   .today-card{
-    background: linear-gradient(135deg, #2c3650, #28304a);
-    border: 1px solid rgba(212,162,78,0.28);
-    border-radius: 16px; padding: 24px 26px; margin-bottom: 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    background: linear-gradient(160deg, #1A1D22, var(--bg-card) 70%);
+    border: 1px solid rgba(217,164,65,0.28);
+    border-radius:10px; padding: 24px 26px; margin-bottom: 22px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
   }
   .today-card .tc-top{ display:flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
   .today-card .tc-date{ font-family:'Fraunces',serif; font-size: 24px; font-weight: 600; margin: 0; }
@@ -75,7 +115,7 @@
   .today-card .tc-deadline b{ display:block; font-family:'Fraunces',serif; font-size: 18px; color: var(--ink); }
   .tc-focus{
     margin: 16px 0 18px; padding: 12px 14px; border-radius: 10px;
-    background: rgba(212,162,78,0.10); border-left: 3px solid var(--accent);
+    background: rgba(217,164,65,0.10); border-left: 3px solid var(--accent);
     font-size: 14px; line-height: 1.5; color: var(--ink);
   }
   .tc-cols{ display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -84,44 +124,44 @@
 
   .chk-row{
     display:flex; align-items:center; gap: 10px; padding: 8px 10px; border-radius: 9px;
-    background: rgba(255,255,255,0.04); margin-bottom: 7px; cursor: pointer;
+    background: var(--bg-raise); margin-bottom: 7px; cursor: pointer;
     transition: background .15s ease; font-size: 13.5px;
   }
-  .chk-row:hover{ background: rgba(255,255,255,0.08); }
+  .chk-row:hover{ background: var(--bg-hover); }
   .chk-box{
     flex: 0 0 auto; width: 19px; height: 19px; border-radius: 6px;
     border: 1.5px solid var(--ink-soft); display:flex; align-items:center; justify-content:center;
     font-size: 12px; font-weight: 700; color: transparent; transition: all .15s ease;
   }
-  .chk-row.done .chk-box{ background: var(--calm); border-color: var(--calm); color: #1c2333; }
+  .chk-row.done .chk-box{ background: var(--calm); border-color: var(--calm); color: var(--on-accent); }
   .chk-row.done .chk-text{ text-decoration: line-through; opacity: .6; }
-  .chk-tag{ margin-left:auto; font-size: 10.5px; color: var(--ink-soft); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 20px; }
+  .chk-tag{ margin-left:auto; font-size: 10.5px; color: var(--ink-soft); background: var(--bg-raise); padding: 2px 8px; border-radius: 20px; }
   .chk-empty{ color: var(--ink-soft); font-size: 13px; font-style: italic; padding: 6px 2px; }
 
   /* ---------- WEEKLY CHALLENGE ---------- */
   .challenge{
     position: relative; overflow: hidden;
-    background: linear-gradient(135deg, #34304a, #2c3650);
-    border: 1px solid rgba(212,162,78,0.35);
-    border-radius: 16px; padding: 22px 24px; margin-bottom: 34px;
+    background: linear-gradient(160deg, #1D1B18, var(--bg-card) 70%);
+    border: 1px solid rgba(217,164,65,0.35);
+    border-radius:10px; padding: 22px 24px; margin-bottom: 34px;
     display:flex; gap: 22px; align-items: stretch; flex-wrap: wrap;
     transition: box-shadow .4s ease, border-color .4s ease;
   }
-  .challenge.done{ border-color: rgba(143,168,136,0.6); box-shadow: 0 0 0 1px rgba(143,168,136,0.4), 0 10px 36px rgba(143,168,136,0.12); }
+  .challenge.done{ border-color: rgba(127,176,105,0.6); box-shadow: 0 0 0 1px rgba(127,176,105,0.4), 0 10px 36px rgba(127,176,105,0.12); }
   .ch-left{ flex: 1; min-width: 240px; }
   .ch-emoji{ font-size: 30px; margin: 0 0 4px; line-height: 1; transition: transform .3s ease; }
   .challenge.done .ch-emoji{ transform: scale(1.15) rotate(-6deg); }
   .ch-title{ font-family:'Fraunces',serif; font-size: 21px; font-weight: 600; margin: 0 0 6px; line-height: 1.25; }
   .ch-why{ color: var(--ink-soft); font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   .ch-result input{
-    width: 100%; max-width: 340px; background: rgba(0,0,0,0.2); border:1px solid var(--rule);
+    width: 100%; max-width: 340px; background: var(--bg-raise); border:1px solid var(--rule);
     color: var(--ink); border-radius: 9px; padding: 9px 12px; font-size: 13px; font-family:'Inter',sans-serif;
   }
   .ch-result input::placeholder{ color: var(--ink-soft); }
   .ch-right{ display:flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 12px; min-width: 180px; }
   .ch-done{
     font-family:'Inter',sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
-    background: var(--accent); color: #1c2333; border: none; border-radius: 11px;
+    background: var(--accent); color: var(--on-accent); border: none; border-radius:8px;
     padding: 12px 22px; transition: all .2s ease; white-space: nowrap;
   }
   .ch-done:hover{ filter: brightness(1.06); }
@@ -142,60 +182,60 @@
     background: transparent; color: var(--ink); transition: all .18s ease;
   }
   .btn:hover{ border-color: var(--accent); color: var(--accent); }
-  .btn-primary{ background: var(--accent); border-color: var(--accent); color: #1c2333; font-weight: 600; }
-  .btn-primary:hover{ filter: brightness(1.06); color: #1c2333; }
+  .btn-primary{ background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .btn-primary:hover{ filter: brightness(1.06); color: var(--on-accent); }
 
   .proj-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
   @media (max-width: 720px){ .proj-grid{ grid-template-columns: 1fr; } }
-  .proj{ background: var(--bg-card); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px; position: relative; }
-  .proj.crit{ border-color: rgba(217,128,100,0.55); box-shadow: inset 0 0 0 1px rgba(217,128,100,0.25); }
+  .proj{ background: var(--bg-card); border: 1px solid var(--rule); border-radius:10px; padding: 16px 18px; position: relative; }
+  .proj.crit{ border-color: rgba(226,104,90,0.55); box-shadow: inset 0 0 0 1px rgba(226,104,90,0.25); }
   .proj-top{ display:flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
   .proj-name{ font-family:'Fraunces',serif; font-size: 17px; font-weight: 600; margin: 0; line-height: 1.25; cursor: text; }
   .proj-x{ flex:0 0 auto; background:none; border:none; color: var(--ink-soft); font-size: 17px; cursor:pointer; line-height:1; padding:2px 4px; border-radius:6px; }
-  .proj-x:hover{ color: var(--crit); background: rgba(217,128,100,0.12); }
+  .proj-x:hover{ color: var(--crit); background: rgba(226,104,90,0.12); }
   .countdown{ display:inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin: 8px 0 10px; }
-  .countdown.crit{ background: rgba(217,128,100,0.18); color: #f0b6a6; }
-  .countdown.warn{ background: rgba(212,162,78,0.18); color: var(--accent); }
-  .countdown.calm{ background: rgba(143,168,136,0.18); color: #aecaa6; }
-  .proj-bar{ height: 6px; background: rgba(243,237,225,0.10); border-radius: 6px; overflow: hidden; margin: 4px 0 6px; }
+  .countdown.crit{ background: rgba(226,104,90,0.14); color: #F0958A; }
+  .countdown.warn{ background: rgba(217,164,65,0.18); color: var(--accent); }
+  .countdown.calm{ background: rgba(127,176,105,0.14); color: #9CC98A; }
+  .proj-bar{ height: 6px; background: var(--bg-raise); border-radius: 6px; overflow: hidden; margin: 4px 0 6px; }
   .proj-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--calm), var(--accent)); border-radius:6px; transition: width .35s ease; }
   .proj-meta{ font-size: 11.5px; color: var(--ink-soft); margin-bottom: 12px; display:flex; justify-content: space-between; gap: 8px; }
   .proj-meta .pace{ font-weight: 600; color: var(--ink); }
   .task{ display:flex; align-items:center; gap: 9px; padding: 6px 4px; font-size: 13px; border-radius: 7px; }
-  .task:hover{ background: rgba(255,255,255,0.04); }
+  .task:hover{ background: var(--bg-raise); }
   .task .tbox{ flex:0 0 auto; width: 17px; height: 17px; border-radius: 5px; border: 1.5px solid var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight:700; color: transparent; cursor:pointer; transition: all .15s ease; }
-  .task.done .tbox{ background: var(--calm); border-color: var(--calm); color:#1c2333; }
+  .task.done .tbox{ background: var(--calm); border-color: var(--calm); color:var(--on-accent); }
   .task.done .ttext{ text-decoration: line-through; opacity: .55; }
   .task .ttext{ flex:1; cursor: pointer; }
   .task .tdel{ background:none; border:none; color: var(--ink-soft); cursor:pointer; opacity:0; font-size: 14px; padding: 0 4px; }
   .task:hover .tdel{ opacity:1; }
   .task .tdel:hover{ color: var(--crit); }
   .task-add{ display:flex; gap: 7px; margin-top: 8px; }
-  .task-add input{ flex:1; min-width:0; background: rgba(0,0,0,0.18); border:1px solid var(--rule); color: var(--ink); border-radius:8px; padding: 7px 10px; font-size: 12.5px; font-family:'Inter',sans-serif; }
+  .task-add input{ flex:1; min-width:0; background: var(--bg-raise); border:1px solid var(--rule); color: var(--ink); border-radius:8px; padding: 7px 10px; font-size: 12.5px; font-family:'Inter',sans-serif; }
   .task-add input::placeholder{ color: var(--ink-soft); }
-  .proj-empty{ background: var(--bg-card); border: 1px dashed var(--flex-border); border-radius: 14px; padding: 22px; text-align:center; color: var(--ink-soft); font-size: 13.5px; line-height:1.6; }
-  .add-form{ background: var(--bg-card); border: 1px solid rgba(212,162,78,0.3); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; display:none; }
+  .proj-empty{ background: var(--bg-card); border: 1px dashed var(--flex-border); border-radius:10px; padding: 22px; text-align:center; color: var(--ink-soft); font-size: 13.5px; line-height:1.6; }
+  .add-form{ background: var(--bg-card); border: 1px solid rgba(217,164,65,0.3); border-radius:10px; padding: 18px 20px; margin-bottom: 16px; display:none; }
   .add-form.open{ display:block; }
   .add-form .row{ display:flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
   .add-form label{ display:flex; flex-direction:column; gap:5px; font-size: 11.5px; color: var(--ink-soft); flex:1; min-width: 160px; }
-  .add-form input, .add-form textarea{ background: rgba(0,0,0,0.2); border:1px solid var(--rule); color: var(--ink); border-radius: 9px; padding: 9px 11px; font-size: 13.5px; font-family:'Inter',sans-serif; }
+  .add-form input, .add-form textarea{ background: var(--bg-raise); border:1px solid var(--rule); color: var(--ink); border-radius: 9px; padding: 9px 11px; font-size: 13.5px; font-family:'Inter',sans-serif; }
   .add-form textarea{ resize: vertical; min-height: 64px; }
   .add-form input[type=date]{ color-scheme: dark; }
   .add-form .actions{ display:flex; gap: 10px; }
 
   /* ---------- MINI PROJECTS ---------- */
-  .mini-wrap{ background: var(--bg-card); border:1px solid var(--rule); border-radius:14px; padding:16px 18px; margin-bottom:34px; }
+  .mini-wrap{ background: var(--bg-card); border:1px solid var(--rule); border-radius:10px; padding:16px 18px; margin-bottom:34px; }
   .mini-add{ display:flex; gap:10px; flex-wrap:wrap; }
-  .mini-add input{ flex:1; min-width:180px; background:rgba(0,0,0,0.2); border:1px solid var(--rule); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:13.5px; font-family:'Inter',sans-serif; }
+  .mini-add input{ flex:1; min-width:180px; background:var(--bg-raise); border:1px solid var(--rule); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:13.5px; font-family:'Inter',sans-serif; }
   .mini-add input::placeholder{ color:var(--ink-soft); }
-  .mini-add select{ background:rgba(0,0,0,0.2); border:1px solid var(--rule); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .mini-add select{ background:var(--bg-raise); border:1px solid var(--rule); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; color-scheme:dark; }
   .mini-list{ margin-top:6px; }
   .mini-day-label{ font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--ink-soft); margin:14px 0 6px; font-weight:600; }
   .mini-day-label.is-today{ color:var(--accent); }
-  .mini-item{ display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:9px; background:rgba(255,255,255,0.04); font-size:13.5px; margin-bottom:6px; }
+  .mini-item{ display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:9px; background:var(--bg-raise); font-size:13.5px; margin-bottom:6px; }
   .mini-item.done .mi-text{ text-decoration:line-through; opacity:.55; }
   .mini-item .mi-box{ flex:0 0 auto; width:18px; height:18px; border-radius:6px; border:1.5px solid var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:transparent; cursor:pointer; transition:all .15s ease; }
-  .mini-item.done .mi-box{ background:var(--calm); border-color:var(--calm); color:#1c2333; }
+  .mini-item.done .mi-box{ background:var(--calm); border-color:var(--calm); color:var(--on-accent); }
   .mini-item .mi-text{ flex:1; cursor:pointer; }
   .mini-item .mi-del{ background:none; border:none; color:var(--ink-soft); cursor:pointer; opacity:0; font-size:15px; padding:0 4px; line-height:1; }
   .mini-item:hover .mi-del{ opacity:1; }
@@ -203,20 +243,20 @@
   .mini-empty{ color:var(--ink-soft); font-size:13px; font-style:italic; padding:10px 2px 2px; line-height:1.5; }
 
   /* ---------- PROGRESS + STREAKS ---------- */
-  .progress{ background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; margin-bottom: 36px; display:flex; flex-wrap: wrap; align-items:center; gap: 18px 28px; }
+  .progress{ background: var(--bg-card); border: 1px solid var(--rule); border-radius:9px; padding: 18px 20px; margin-bottom: 36px; display:flex; flex-wrap: wrap; align-items:center; gap: 18px 28px; }
   .progress .p-block{ display:flex; flex-direction: column; gap: 4px; min-width: 92px; }
   .progress .p-num{ font-family:'Fraunces',serif; font-size: 24px; font-weight: 600; color: var(--ink); line-height:1; }
   .progress .p-num small{ font-size: 14px; color: var(--ink-soft); font-family:'Inter',sans-serif; font-weight:500; }
   .progress .p-label{ font-size: 11.5px; color: var(--ink-soft); letter-spacing: .3px; text-transform: uppercase; }
   .progress .p-bar-wrap{ flex:1; min-width: 160px; }
-  .progress .p-bar{ height: 8px; background: rgba(243,237,225,0.10); border-radius: 6px; overflow: hidden; }
+  .progress .p-bar{ height: 8px; background: var(--bg-raise); border-radius: 6px; overflow: hidden; }
   .progress .p-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--gym), var(--accent)); border-radius:6px; transition: width .4s ease; }
   .progress .p-note{ font-size: 12px; color: var(--ink-soft); margin-top: 8px; font-style: italic; }
   .streaks{ display:flex; gap: 10px; flex-wrap: wrap; }
   .streak{ font-size: 12px; color: var(--ink); padding: 6px 12px; border-radius: 20px; border:1px solid; }
-  .streak.cardio-s{ background: rgba(214,143,106,0.14); border-color: rgba(214,143,106,0.32); }
-  .streak.gym-s{ background: rgba(143,168,136,0.16); border-color: rgba(143,168,136,0.3); }
-  .streak.lang-s{ background: rgba(212,162,78,0.14); border-color: rgba(212,162,78,0.3); }
+  .streak.cardio-s{ background: rgba(224,138,91,0.14); border-color: rgba(224,138,91,0.32); }
+  .streak.gym-s{ background: rgba(127,176,105,0.16); border-color: rgba(127,176,105,0.3); }
+  .streak.lang-s{ background: rgba(217,164,65,0.14); border-color: rgba(217,164,65,0.3); }
   .streak b{ font-family:'Fraunces',serif; }
   .progress .p-reset{ background: transparent; border:1px solid var(--flex-border); color: var(--ink-soft); font-family:'Inter',sans-serif; font-size:12px; padding:7px 14px; border-radius:8px; cursor:pointer; transition: all .2s ease; }
   .progress .p-reset:hover{ color: var(--ink); border-color: var(--ink-soft); }
@@ -224,28 +264,28 @@
   /* ---------- TIMELINE ---------- */
   .day{ border-bottom: 1px solid var(--rule); padding: 18px 0; transition: background .3s ease; border-radius:10px; }
   .day:first-of-type{ padding-top: 0; }
-  .day.today{ background: linear-gradient(90deg, rgba(212,162,78,0.10), rgba(212,162,78,0.0)); padding-left: 16px; padding-right: 16px; margin: 0 -16px; border-bottom-color: transparent; box-shadow: inset 3px 0 0 var(--accent); }
+  .day.today{ background: linear-gradient(90deg, rgba(217,164,65,0.10), rgba(217,164,65,0.0)); padding-left: 16px; padding-right: 16px; margin: 0 -16px; border-bottom-color: transparent; box-shadow: inset 3px 0 0 var(--accent); }
   .day-head{ display:flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; gap: 12px; }
   .day-head h2{ font-family:'Fraunces',serif; font-weight:600; font-size: 20px; margin:0; display:flex; align-items:center; gap:10px; }
-  .today-pill{ display:none; font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:#1c2333; background: var(--accent); padding:3px 9px; border-radius:20px; }
+  .today-pill{ display:none; font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--on-accent); background: var(--accent); padding:3px 9px; border-radius:20px; }
   .day.today .today-pill{ display:inline-block; }
   .day-head .tag{ font-size:12px; color: var(--ink-soft); font-style: italic; text-align:right; }
 
   .timeline{ display:flex; width:100%; border-radius:8px; overflow:hidden; min-height:56px; background: var(--bg-card); }
-  .seg{ display:flex; align-items:center; justify-content:center; text-align:center; padding:6px; font-size:11.5px; line-height:1.35; color:#1c2333; border-right:1px solid rgba(0,0,0,0.08); position:relative; }
+  .seg{ display:flex; align-items:center; justify-content:center; text-align:center; padding:6px; font-size:11.5px; line-height:1.35; color:var(--on-accent); border-right:1px solid rgba(0,0,0,0.08); position:relative; }
   .seg:last-child{ border-right:none; }
-  .seg.work{ background: var(--work); color:#f3ede1; }
-  .seg.work-heavy{ background: var(--work-heavy); color:#f3ede1; }
+  .seg.work{ background: var(--work); color:var(--ink); }
+  .seg.work-heavy{ background: var(--work-heavy); color:var(--ink); }
   .seg.gym{ background: var(--gym); }
-  .seg.cardio{ background: var(--cardio); color:#241a14; }
+  .seg.cardio{ background: var(--cardio); color: var(--on-accent); }
   .seg.lang{ background: var(--lang); }
   .seg.routine{ background: var(--routine); }
   .seg.flex{ background: var(--flex-bg); color: var(--ink); border:1px dashed var(--flex-border); }
   .seg.checkable{ cursor:pointer; -webkit-user-select:none; user-select:none; transition: filter .15s ease, box-shadow .15s ease; }
   .seg.checkable:hover{ filter: brightness(1.06); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35); }
-  .seg.checkable .check{ position:absolute; top:4px; right:5px; width:17px; height:17px; border-radius:50%; border:1.5px solid rgba(28,35,51,0.45); background: rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:transparent; transition: all .18s ease; }
+  .seg.checkable .check{ position:absolute; top:4px; right:5px; width:17px; height:17px; border-radius:50%; border:1.5px solid rgba(14,15,17,0.5); background: rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:transparent; transition: all .18s ease; }
   .seg.checkable.done::after{ content:""; position:absolute; inset:0; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.12) 0 6px, transparent 6px 12px); pointer-events:none; }
-  .seg.checkable.done .check{ background:#2f3b27; border-color:#2f3b27; color:#eaf3e3; }
+  .seg.checkable.done .check{ background: var(--on-accent); border-color: var(--on-accent); color: var(--gym); }
   .seg.checkable.done .seg-label{ text-decoration: line-through; opacity:.82; }
   .seg .proj-hint{ position:absolute; bottom:3px; left:0; right:0; font-size:9.5px; color: var(--accent); font-weight:600; }
 
@@ -253,14 +293,18 @@
 
   /* ---------- SCHEDULE EDIT ---------- */
   .sched-toolbar{ margin: -6px 0 22px; }
+  .hx-notice{ margin: 4px 0 14px; padding: 11px 14px; font-size: 13px; line-height: 1.55;
+    background: rgba(217,164,65,0.10); border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0; }
+  .hx-notice b{ color: var(--accent); }
+  .hx-notice .link{ margin-left: 4px; }
   .day-edit{ display:none; background:var(--bg-card); border:1px solid var(--rule); border-radius:10px; padding:12px 14px; }
   body.sched-edit .timeline{ display:none; }
   body.sched-edit .axis-marks{ display:none; }
   body.sched-edit .day-edit{ display:block; }
-  .de-tag{ width:100%; margin-bottom:10px; background:rgba(0,0,0,0.2); border:1px solid var(--rule); color:var(--ink); border-radius:8px; padding:7px 10px; font-size:12.5px; font-family:'Inter',sans-serif; }
+  .de-tag{ width:100%; margin-bottom:10px; background:var(--bg-raise); border:1px solid var(--rule); color:var(--ink); border-radius:8px; padding:7px 10px; font-size:12.5px; font-family:'Inter',sans-serif; }
   .de-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:7px 0; border-bottom:1px solid var(--rule); }
   .de-row:last-of-type{ border-bottom:none; }
-  .de-row select, .de-row input{ background:rgba(0,0,0,0.2); border:1px solid var(--rule); color:var(--ink); border-radius:7px; padding:6px 8px; font-size:12px; font-family:'Inter',sans-serif; color-scheme:dark; }
+  .de-row select, .de-row input{ background:var(--bg-raise); border:1px solid var(--rule); color:var(--ink); border-radius:7px; padding:6px 8px; font-size:12px; font-family:'Inter',sans-serif; color-scheme:dark; }
   .de-row .de-label{ flex:1 1 140px; min-width:120px; }
   .de-row .de-sub{ flex:1 1 110px; min-width:100px; }
   .de-row .de-time{ width:84px; }
@@ -276,7 +320,7 @@
   /* ---------- GOALS ---------- */
   .goals-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:34px; }
   @media (max-width:720px){ .goals-grid{ grid-template-columns:1fr; } }
-  .goal-card{ background:var(--bg-card); border:1px solid var(--rule); border-radius:14px; padding:18px 20px; display:flex; gap:16px; flex-direction:column; }
+  .goal-card{ background:var(--bg-card); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; display:flex; gap:16px; flex-direction:column; }
   .goal-card.year{ flex-direction:row; flex-wrap:wrap; }
   .goal-main{ flex:1; min-width:180px; }
   .goal-title{ width:100%; background:transparent; border:none; border-bottom:1px solid var(--rule); color:var(--ink); font-family:'Fraunces',serif; font-size:17px; font-weight:600; padding:2px 0 8px; margin-bottom:10px; }
@@ -289,18 +333,18 @@
   .goal-empty{ color:var(--ink-soft); font-size:12.5px; font-style:italic; padding:6px 2px; }
 
   /* ---------- WEEKLY REVIEW ---------- */
-  .review{ margin-top: 36px; background: var(--bg-card); border:1px solid var(--rule); border-radius: 14px; overflow:hidden; }
+  .review{ margin-top: 36px; background: var(--bg-card); border:1px solid var(--rule); border-radius:10px; overflow:hidden; }
   .review > summary{ list-style:none; cursor:pointer; padding: 18px 22px; display:flex; align-items:center; justify-content: space-between; }
   .review > summary::-webkit-details-marker{ display:none; }
   .review summary h3{ font-family:'Fraunces',serif; font-size:18px; font-weight:600; margin:0; }
   .review summary .r-when{ font-size:12px; color: var(--ink-soft); font-style:italic; }
   .review .r-body{ padding: 0 22px 22px; }
   .trend{ display:flex; align-items:flex-end; gap:14px; margin-bottom: 18px; flex-wrap:wrap; }
-  .trend svg{ background: rgba(0,0,0,0.15); border-radius:10px; }
+  .trend svg{ background: var(--bg-raise); border-radius:10px; }
   .trend .t-cap{ font-size:12px; color: var(--ink-soft); line-height:1.5; }
   .review label.q{ display:block; margin-bottom: 14px; }
   .review label.q span{ display:block; font-size:13px; color: var(--ink); margin-bottom:6px; }
-  .review textarea{ width:100%; background: rgba(0,0,0,0.18); border:1px solid var(--rule); color: var(--ink); border-radius:9px; padding:10px 12px; font-size:13.5px; font-family:'Inter',sans-serif; resize:vertical; min-height:54px; }
+  .review textarea{ width:100%; background: var(--bg-raise); border:1px solid var(--rule); color: var(--ink); border-radius:9px; padding:10px 12px; font-size:13.5px; font-family:'Inter',sans-serif; resize:vertical; min-height:54px; }
   .review .saved{ font-size:11.5px; color: var(--calm); opacity:0; transition: opacity .3s ease; }
   .review .saved.show{ opacity:1; }
 
@@ -310,24 +354,79 @@
   .rep-title{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; margin:0; display:flex; align-items:center; gap:10px; }
   .rep-nav button{ background:transparent; border:1px solid var(--flex-border); color:var(--ink); width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:16px; line-height:1; padding:0; }
   .rep-nav button:hover{ border-color:var(--accent); color:var(--accent); }
-  .rep-toggle{ display:inline-flex; background:rgba(0,0,0,0.2); border-radius:10px; padding:3px; }
+  .rep-toggle{ display:inline-flex; background:var(--bg-raise); border-radius:10px; padding:3px; }
   .rep-toggle button{ background:transparent; border:none; color:var(--ink-soft); font-family:'Inter',sans-serif; font-size:13px; font-weight:500; padding:7px 16px; border-radius:8px; cursor:pointer; }
-  .rep-toggle button.active{ background:var(--accent); color:#1c2333; font-weight:600; }
+  .rep-toggle button.active{ background:var(--accent); color:var(--on-accent); font-weight:600; }
   .rep-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(116px,1fr)); gap:12px; margin-bottom:18px; }
-  .tile{ background:var(--bg-card); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; }
+  .tile{ background:var(--bg-card); border:1px solid var(--rule); border-radius:9px; padding:14px 16px; }
   .tile .t-num{ font-family:'Fraunces',serif; font-size:25px; font-weight:600; line-height:1; color:var(--ink); }
   .tile .t-lab{ font-size:11px; color:var(--ink-soft); margin-top:7px; text-transform:uppercase; letter-spacing:.4px; }
   .tile.cardio .t-num{ color:var(--cardio); }
   .tile.gym .t-num{ color:var(--gym); }
   .tile.eng .t-num{ color:var(--lang); }
   .tile.chal .t-num{ color:var(--accent); }
-  .rep-chart{ background:var(--bg-card); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:36px; }
+  .rep-chart{ background:var(--bg-card); border:1px solid var(--rule); border-radius:9px; padding:18px; margin-bottom:36px; }
   .rep-chart h5{ margin:0 0 12px; font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-soft); font-weight:600; }
   .rep-empty{ color:var(--ink-soft); font-size:13px; font-style:italic; padding:18px 2px; }
 
   footer{ margin-top:36px; padding-top:24px; border-top:1px solid var(--rule); font-size:14px; line-height:1.7; color: var(--ink-soft); }
   footer strong{ color: var(--ink); }
   footer .hint{ font-size:12.5px; font-style:italic; opacity:.9; }
+
+  /* ---------- HYROX RACE CARD ---------- */
+  .hyrox{
+    background: linear-gradient(160deg, #1F1A17, var(--bg-card) 66%);
+    border: 1px solid rgba(224,138,91,0.38);
+    border-radius:10px; padding: 22px 24px; margin-bottom: 22px;
+    display:flex; flex-wrap:wrap; gap: 24px; align-items:flex-start;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+  }
+  .hx-left{ flex: 1 1 210px; min-width:0; }
+  .hx-right{ flex: 2 1 330px; min-width:0; display:flex; flex-direction:column; gap:10px; }
+  .hx-count{ font-family:'Fraunces',serif; font-size: 54px; line-height:1; font-weight:600; color: var(--cardio); margin:0; }
+  .hx-count small{ font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--ink-soft); margin-left:8px; letter-spacing:.6px; }
+  .hx-race{ font-size:13.5px; color: var(--ink-soft); line-height:1.5; margin:10px 0 0; }
+  .hx-race b{ color: var(--ink); }
+  .hx-week{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .hx-wknum{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; }
+  .hx-phase{
+    font-size:10.5px; font-weight:600; letter-spacing:.9px; text-transform:uppercase;
+    padding:3px 10px; border-radius:20px;
+    background: rgba(217,164,65,0.16); color: var(--accent); border:1px solid rgba(217,164,65,0.34);
+  }
+  .hx-phase.peak{ background: rgba(226,104,90,0.18); color: var(--crit); border-color: rgba(226,104,90,0.42); }
+  .hx-phase.cut{ background: rgba(127,176,105,0.16); color: var(--calm); border-color: rgba(127,176,105,0.36); }
+  .hx-bar{ height:7px; border-radius:5px; background: var(--bg-raise); overflow:hidden; }
+  .hx-bar-fill{ height:100%; border-radius:5px; width:0%; background: linear-gradient(90deg, var(--gym), var(--accent), var(--cardio)); transition: width .4s ease; }
+  .hx-focus{ display:flex; flex-direction:column; gap:8px; margin-top:2px; }
+  .hx-row{ display:flex; gap:12px; font-size:13.5px; line-height:1.45; }
+  .hx-row .k{ flex:0 0 74px; color:var(--ink-soft); font-size:10.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; padding-top:3px; }
+  .hx-row .v{ flex:1; color:var(--ink); min-width:0; }
+  .hx-note{ font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5; margin:4px 0 0; }
+
+  /* "What am I doing tonight" — the part of the card that should be read first. */
+  .hx-today{ background:var(--bg-raise); border:1px solid var(--rule); border-radius:9px; padding:13px 15px 14px; }
+  .hx-today-when{ font-size:10.5px; font-weight:600; letter-spacing:.9px; text-transform:uppercase;
+    color:var(--accent); margin:0 0 5px; }
+  .hx-today-title{ font-family:'Fraunces',Georgia,serif; font-size:19px; line-height:1.15; margin:0; }
+  .hx-today-why{ font-size:12px; color:var(--ink-soft); margin:3px 0 0; line-height:1.45; }
+  .hx-today-list{ list-style:none; margin:11px 0 0; padding:0; display:flex; flex-direction:column; }
+  .hx-today-list li{ display:flex; gap:12px; align-items:baseline; justify-content:space-between;
+    font-size:13.5px; line-height:1.45; padding:5px 0; border-top:1px solid var(--rule); }
+  .hx-today-list li:first-child{ border-top:none; padding-top:2px; }
+  .hx-today-list .a{ color:var(--ink); min-width:0; }
+  .hx-today-list .b{ flex:none; color:var(--accent); font-variant-numeric:tabular-nums; font-size:12.5px; white-space:nowrap; }
+
+  /* Chinese variant of the race card */
+  .hyrox.zh{ background: linear-gradient(160deg, #1E1C15, var(--bg-card) 66%); border-color: rgba(217,164,65,0.38); }
+  .hyrox.zh .hx-count{ color: var(--lang); }
+  .hyrox.zh .hx-bar-fill{ background: linear-gradient(90deg, var(--work), var(--lang)); }
+
+  @media (max-width: 640px){
+    .hx-count{ font-size:44px; }
+    .hx-row{ flex-direction:column; gap:2px; }
+    .hx-row .k{ flex:none; padding-top:0; }
+  }
 
   @media (max-width: 720px){
     .timeline{ overflow-x:auto; }
@@ -338,22 +437,25 @@
 </style>
 </head>
 <body>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
 <div class="page">
 
-  <div class="dawn-bar"></div>
+  <div class="daybar"><canvas id="dayBanner"></canvas><span class="db-cap" id="dbCap"></span></div>
 
   <header>
     <h1>Your Week — 5am to 10pm</h1>
-    <p>Lifting runs every weeknight evening as a five-day split: Push, Pull, Legs, Chest &amp; Back, Arms &amp; Shoulders — with cardio (run + rope jump) right after each session, since you're already warmed up. Saturday and Sunday have no lifting, so the morning cardio anchor stays there instead. Every week opens with one challenge to chase. Your work projects move through your 8–5 in stages, and if a day doesn't happen, the plan resets clean tomorrow at 5am.</p>
+    <p>Lifting is three evenings a week now — Gym A legs &amp; press, Gym B pull &amp; grip, Gym C stations — because Tuesday and Thursday belong to the runs. Everything trains at 18:00 as usual, so there's one evening habit to keep, not two wake-up times. Saturday is a heavy work day, so it's recovery only. Sunday 6am is the long session and the anchor of the whole thing. Every week opens with one challenge to chase. Your work projects move through your 8–5 in stages, and if a day doesn't happen, the plan resets clean tomorrow at 5am.</p>
+    <p style="margin-top:-16px"><b>You're in the HYROX Bangkok build.</b> From 17 Aug 2026 the week below is the 26-week race build — three lifting days, two evening runs, and a long Sunday session. It loaded itself when the block opened; your streaks and history carried straight over.</p>
 
     <div class="legend" id="legend"></div>
-    <div class="sched-toolbar"><button class="btn" id="schedToggle">✎ Customize schedule</button> <button class="link" id="schedResetDefault" title="Wipe your customizations and reload the built-in routine">↺ Reset to default schedule</button></div>
-    <div class="gcal-bar" id="gcalBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:8px">
-      <button class="btn" id="gcalConnect">📅 Connect Google Calendar</button>
-      <button class="btn" id="gcalSync" style="display:none">↻ Sync now</button>
-      <label id="gcalAutoWrap" style="display:none;font-size:13px;color:var(--ink-soft)"><input type="checkbox" id="gcalAuto" style="vertical-align:middle"> auto-sync when I edit</label>
-      <span class="gcal-status" id="gcalStatus" style="font-size:12px;color:var(--ink-soft)"></span>
+    <div class="hx-notice" id="hxNotice" style="display:none">
+      <b>🏁 Your week just switched to the HYROX training build.</b>
+      Mon/Wed/Fri gym A·B·C at 18:00 · Tue/Thu runs at 18:00 · Sat recovery · Sun 6am long session.
+      Same habits underneath, so nothing you've logged was lost.
+      <button class="link" id="hxKeep" title="Keep the HYROX week and hide this message">✓ Got it</button>
+      <button class="link" id="hxUndo" title="Put back the schedule you had before the swap">↺ Undo — restore my old week</button>
     </div>
+    <div class="sched-toolbar"><button class="btn" id="schedToggle">✎ Customize schedule</button> <button class="link" id="schedHyrox" title="Swap in the 26-week HYROX training week: 3 lifting days, 2 evening runs, 1 long Sunday session">🏁 Load HYROX training week</button> <button class="link" id="schedResetDefault" title="Wipe your customizations and reload the built-in routine">↺ Reset to default schedule</button></div>
     <div class="backup-bar" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px">
       <button class="link" id="dataExport" title="Save all your planner data (goals, projects, streaks, history) to a file">⬇ Back up my data</button>
       <button class="link" id="dataImport" title="Load your data from a backup file">⬆ Restore from backup</button>
@@ -400,6 +502,50 @@
         <button class="link" id="chOwn">✎ Write my own</button>
       </div>
       <p class="ch-tally" id="chTally"></p>
+    </div>
+  </div>
+
+  <!-- ============ HYROX BANGKOK 2027 ============ -->
+  <div class="hyrox" id="hyroxCard">
+    <div class="hx-left">
+      <p class="section-label" style="margin-bottom:8px">HYROX Bangkok</p>
+      <p class="hx-count" id="hxCount">—<small>days</small></p>
+      <p class="hx-race" id="hxRace"></p>
+    </div>
+    <div class="hx-right">
+      <div class="hx-week"><span class="hx-wknum" id="hxWeek"></span><span class="hx-phase" id="hxPhase"></span></div>
+      <div class="hx-bar"><div class="hx-bar-fill" id="hxBarFill"></div></div>
+
+      <div class="hx-today">
+        <p class="hx-today-when" id="hxTodayWhen"></p>
+        <p class="hx-today-title" id="hxTodayTitle"></p>
+        <p class="hx-today-why" id="hxTodayWhy"></p>
+        <ul class="hx-today-list" id="hxTodayList"></ul>
+      </div>
+
+      <div class="hx-focus">
+        <div class="hx-row"><span class="k">This week</span><span class="v" id="hxRun"></span></div>
+        <div class="hx-row"><span class="k">Sunday</span><span class="v" id="hxLong"></span></div>
+      </div>
+      <p class="hx-note" id="hxNote"></p>
+    </div>
+  </div>
+
+  <!-- ============ CHINESE — 20-WEEK AUDIO COURSE ============ -->
+  <div class="hyrox zh" id="zhCard">
+    <div class="hx-left">
+      <p class="section-label" style="margin-bottom:8px">中 Chinese course</p>
+      <p class="hx-count" id="zhCount">—<small>days</small></p>
+      <p class="hx-race" id="zhSub"></p>
+    </div>
+    <div class="hx-right">
+      <div class="hx-week"><span class="hx-wknum" id="zhWeek"></span><span class="hx-phase" id="zhKind"></span></div>
+      <div class="hx-bar"><div class="hx-bar-fill" id="zhBarFill"></div></div>
+      <div class="hx-focus">
+        <div class="hx-row"><span class="k">This week</span><span class="v" id="zhMaterial"></span></div>
+        <div class="hx-row"><span class="k">Tonight</span><span class="v" id="zhToday"></span></div>
+      </div>
+      <p class="hx-note" id="zhNote"></p>
     </div>
   </div>
 
@@ -477,6 +623,15 @@
     </div>
     <div class="streaks" id="streaks"></div>
     <button class="p-reset" id="pReset" title="Clear this week's habit checks">Reset week</button>
+  </div>
+
+  <!-- ============ CONSISTENCY ============ -->
+  <div class="consist" id="consist">
+    <h5 id="cnTitle">Consistency</h5>
+    <p class="cn-sub" id="cnSub"></p>
+    <div id="cnYearWrap"></div>
+    <div class="cn-scale" id="cnScale"></div>
+    <div class="cn-sparks" id="cnSparks"></div>
   </div>
 
   <div class="axis-marks">
@@ -599,6 +754,9 @@
   var K_MINI     = "yourweek:miniprojects";
   var K_HISTORY = "yourweek:history";
   var K_SCHEDULE = "yourweek:schedule";
+  var K_HYROX_AUTO = "yourweek:hyrox:autoloaded";   // set once the race week has been applied (or declined)
+  var K_SCHEDULE_PRE = "yourweek:schedule:prehyrox"; // the schedule that was in place before the swap
+  var K_HYROX_NOTICE = "yourweek:hyrox:notice";      // banner stays up until it's actually acknowledged
   var K_TYPELABELS = "yourweek:typelabels";
   var NOW = new Date();
   var YK = ""+NOW.getFullYear();
@@ -672,7 +830,15 @@
     { e:"🎬", t:"Watch one full episode in English — English subtitles only", w:"Let your ear do the work. No native subtitles." },
     { e:"🏋️", t:"Beat a main lift by 2.5 kg", w:"One lift, one plate jump. Strength is built in small steps." },
     { e:"👟", t:"10,000 steps before noon on a work day", w:"Front-load the movement. The afternoon takes care of itself." },
-    { e:"📖", t:"Learn 15 new English words — use 5 in real sentences", w:"Words you use stick. Words you memorise fade." }
+    { e:"📖", t:"Learn 15 new English words — use 5 in real sentences", w:"Words you use stick. Words you memorise fade." },
+    { e:"🏐", t:"100 wall balls for time", w:"The station that decides your race. Break at 10 from the start — never go to failure." },
+    { e:"🧺", t:"Farmers carry 200 m without dropping", w:"Race distance, race weight. Grip is trainable and this is how." },
+    { e:"🤸", t:"40 m of burpee broad jumps under 2:30", w:"Nobody enjoys these. Everyone who beats you has done them anyway." },
+    { e:"🚣", t:"Row 1000 m — then beat it next week", w:"Log the split. This is a station you can measure to the second." },
+    { e:"🦵", t:"100 m of loaded lunges, back knee touching every rep", w:"Race standard or it doesn't count. Quads will complain." },
+    { e:"⏱️", t:"Run 1 km, do a station, run 1 km again", w:"Compromised running — the one skill HYROX actually tests." },
+    { e:"🏃", t:"Run three times this week, no matter how short", w:"Consistency beats any single heroic session. Three is the number." },
+    { e:"🐢", t:"Run your easy run genuinely easy — able to talk the whole way", w:"Hardest challenge on this list for a lifter. Ego down, base up." }
   ];
   var CONGRATS = ["Nice.","That's the one.","Earned it.","Strong week.","Logged it. 💪","Respect."];
 
@@ -741,6 +907,246 @@
     }
   });
 
+  /* ===== HYROX BANGKOK 2027 ===== */
+  /* Race weekend 11–14 Feb 2027, BITEC. Open Singles. 26-week block starts Mon 17 Aug 2026. */
+  var HX_RACE  = "2027-02-13";
+  var HX_START = "2026-08-17";
+  var HX_PLAN = [
+    { p:"base",  r:"Run/walk 2:1 × 7 — just get moving",      l:"25 min run/walk + benchmark tests" },
+    { p:"base",  r:"Run/walk 3:1, 22 min",                          l:"30 min run/walk" },
+    { p:"base",  r:"Run/walk 4:1, 25 min",                          l:"35 min run/walk" },
+    { p:"cut",   r:"Cutback — 20 min, first continuous try",    l:"30 min easy" },
+    { p:"base",  r:"25 min continuous",                             l:"40 min run/walk" },
+    { p:"base",  r:"28 min continuous + 4 × 20 s strides",      l:"45 min run/walk" },
+    { p:"base",  r:"30 min continuous",                             l:"5 km unbroken — first milestone" },
+    { p:"cut",   r:"Cutback — 25 / 20 min easy",                l:"4 km easy + 2 km time trial" },
+    { p:"build", r:"Intervals begin — 6 × 400 m",           l:"6 km easy" },
+    { p:"build", r:"5 × 600 m",                                 l:"6.5 km easy" },
+    { p:"build", r:"4 × 800 m",                                 l:"7 km + 3 stations after" },
+    { p:"cut",   r:"Cutback — easy running + strides only",     l:"5 km easy" },
+    { p:"build", r:"5 × 800 m",                                 l:"8 km easy" },
+    { p:"build", r:"3 × 1 km at goal race pace",                l:"8 km + 4 stations" },
+    { p:"build", r:"4 × 1 km at goal race pace",                l:"9 km easy" },
+    { p:"cut",   r:"Cutback — 30 / 25 min easy",                l:"6 km + 5 km time trial" },
+    { p:"spec",  r:"Compromised — 4 × (1 km + station)",   l:"10 km easy" },
+    { p:"spec",  r:"5 × (1 km + station)",                      l:"Half simulation — 4 runs, 4 stations" },
+    { p:"spec",  r:"6 × 1 km at race pace",                     l:"10 km + wall ball finisher" },
+    { p:"cut",   r:"Cutback — holiday week, keep it easy",      l:"6 km easy" },
+    { p:"spec",  r:"6 × (1 km + station)",                      l:"FULL SIMULATION #1 — all 8, timed" },
+    { p:"spec",  r:"4 × 1 km fast, full recovery",              l:"8 km + 4 stations at race pace" },
+    { p:"peak",  r:"Peak — 8 × 1 km at race pace",         l:"FULL SIMULATION #2 — dress rehearsal" },
+    { p:"taper", r:"Sharpen — 3 × 1 km at race pace",      l:"6 km + 3 stations, crisp not hard" },
+    { p:"taper", r:"Taper — 4 × 400 m sharp, 20 min easy", l:"5 km easy, feel fresh" },
+    { p:"race",  r:"Race week — 20 min Mon, 15 min Wed, rest Thu/Fri", l:"RACE DAY" }
+  ];
+  var HX_PHASE = { base:"Base", build:"Build", spec:"Specific", peak:"Peak", taper:"Taper", cut:"Cutback", race:"Race week" };
+  var HX_NOTE = {
+    base:"Every run stays conversational. Time on feet is the only goal — speed comes later, injuries come early.",
+    build:"This is where fitness actually changes, and the phase most people quietly abandon. Show up.",
+    spec:"Running on wrecked legs is the specific skill. Your pace will collapse — that collapse shrinking is the adaptation.",
+    peak:"The biggest week of the block. After this it's all downhill to the start line.",
+    cut:"Pull back on purpose. This is the week the last three weeks of work actually lands.",
+    taper:"You'll feel sluggish and a bit anxious. That's the taper working, not fitness leaving. Nothing new.",
+    race:"Nothing new: no new shoes, no new food, no new movements. Run 1 should feel too slow."
+  };
+
+  /* ---- What to actually do today ----------------------------------------
+     The three gym days are the same sessions all block long (loads change, not the list),
+     straight out of the Road to Bangkok tables. The two runs and the Sunday long session
+     come from HX_PLAN so they progress week by week. Friday turns into a continuous
+     circuit from week 17, when compromised running becomes the point. */
+  var HX_GYM = {
+    A: { name:"Gym A — Legs & Press", why:"squat-led — feeds sled push, lunges and wall balls", items:[
+      ["Back squat","4 × 5–6"], ["Romanian deadlift","3 × 8"], ["Walking lunge, dumbbells","3 × 20 steps"],
+      ["Overhead press","3 × 8"], ["Weighted step-up","3 × 10 / leg"], ["Standing calf raise","3 × 15"],
+      ["Arm finisher — optional","10 min"] ] },
+    B: { name:"Gym B — Pull & Grip", why:"feeds sled pull, SkiErg and farmers carry", items:[
+      ["Deadlift (trap bar if you have one)","4 × 5"], ["Pull-ups","4 × max"], ["Chest-supported row","3 × 10"],
+      ["Farmers carry, heavy","4 × 40–60 m"], ["Dead hang","3 × max"], ["Face pull","3 × 15"],
+      ["Hanging leg raise","3 × 12"], ["Arm finisher — optional","10 min"] ] },
+    C: { name:"Gym C — Stations", why:"the race movements themselves", items:[
+      ["Wall balls","5 × 20"], ["Sled push / substitute","4 × 25 m"], ["Sled pull / substitute","4 × 25 m"],
+      ["Loaded lunges","4 × 25 m"], ["Burpee broad jumps","4 × 20 m"], ["Row or SkiErg","4 × 500 m"],
+      ["Core finisher","5 min"] ] },
+    Ccircuit: { name:"Gym C — Race circuit", why:"continuous, race effort — no rest between stations", items:[
+      ["Wall balls","20"], ["Loaded lunges","25 m"], ["Burpee broad jumps","15"], ["Row","250 m"],
+      ["→ four rounds, no stopping",""] ] }
+  };
+
+  /* dow is JS getDay(): 0 Sun .. 6 Sat. Returns what tonight's session actually is. */
+  function hxSession(dow, wk, weekNum){
+    function gym(key, time){
+      var g = HX_GYM[key];
+      return { when:time, title:g.name, why:g.why,
+               items:g.items.map(function(p){ return { a:p[0], b:p[1] }; }) };
+    }
+    if (dow === 1) return gym("A", "18:00–19:30");
+    if (dow === 3) return gym("B", "18:00–19:30");
+    if (dow === 5) return gym(weekNum >= 17 ? "Ccircuit" : "C", "18:00–19:30");
+    if (dow === 2) return { when:"18:00–19:00", title:"Run — the hard one", why:"the quality session of the week", items:[
+      { a:"Warm up, easy jog", b:"10 min" },
+      { a:wk.r, b:"main set" },
+      { a:"Cool down, easy jog", b:"10 min" },
+      { a: weekNum <= 8 ? "If you can't talk, walk. That's the rule." : "Intervals at a pace you could hold ~20 min flat out — not a sprint. Jog the same time you worked.", b:"" }
+    ] };
+    if (dow === 4) return { when:"18:00–19:00", title:"Run — easy", why:"recovery that happens to be running", items:[
+      { a:"Easy, conversational running", b:"~40 min" },
+      { a:"Stays easy no matter how good Tuesday felt", b:"" },
+      { a: weekNum >= 6 ? "Optional: 4 × 20 s strides at the end — fast but relaxed, full recovery" : "Slow on purpose. Tendons take months; muscles take weeks.", b:"" }
+    ] };
+    if (dow === 6) return { when:"05:00–05:15 · optional", title:"Recovery only", why:"heavy work day 8:00–18:00 — protect it", items:[
+      { a:"Rope jump or mobility, only if you feel like it", b:"10 min" },
+      { a:"Eat well and get to bed early — tomorrow is the big one", b:"" }
+    ] };
+    return { when:"06:00–08:00", title:"Long session — the anchor", why:"the most important session of your week", items:[
+      { a:wk.l, b:"main set" },
+      { a:"Refuel properly afterwards — carbs, you earned them", b:"" }
+    ] };
+  }
+
+  var HX_DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  function renderHyrox(){
+    var card = document.getElementById("hyroxCard");
+    if (!card) return;
+    var race = parseDate(HX_RACE), start = parseDate(HX_START);
+    var days = daysBetween(TODAY, race);
+    var elapsed = daysBetween(start, TODAY);
+    var idx = Math.floor(elapsed / 7);               // 0-based week of the block
+    var pre = idx < 0;
+    if (idx < 0) idx = 0;
+    if (idx > HX_PLAN.length - 1) idx = HX_PLAN.length - 1;
+    var wk = HX_PLAN[idx];
+
+    document.getElementById("hxCount").innerHTML =
+      (days > 0 ? days : days === 0 ? 0 : Math.abs(days)) +
+      '<small>' + (days > 1 ? "days to go" : days === 1 ? "day to go" : days === 0 ? "RACE DAY" : "days ago") + '</small>';
+
+    document.getElementById("hxRace").innerHTML =
+      "<b>11–14 Feb 2027</b> · BITEC, Bangkok<br>Open Singles · 8 km + 8 stations";
+
+    document.getElementById("hxWeek").textContent =
+      pre ? "Starts " + Math.abs(elapsed) + "d from now" : "Week " + (idx + 1) + " of " + HX_PLAN.length;
+
+    var ph = document.getElementById("hxPhase");
+    ph.textContent = HX_PHASE[wk.p] || wk.p;
+    ph.className = "hx-phase" + (wk.p === "peak" || wk.p === "race" ? " peak" : wk.p === "cut" ? " cut" : "");
+
+    var pct = pre ? 0 : Math.max(0, Math.min(100, Math.round(((idx + 1) / HX_PLAN.length) * 100)));
+    document.getElementById("hxBarFill").style.width = pct + "%";
+
+    /* The whole point of this panel: answer "what am I doing tonight?" without reading a plan. */
+    var dow = TODAY.getDay(), s = hxSession(dow, wk, idx + 1);
+    document.getElementById("hxTodayWhen").textContent = HX_DOW[dow] + " · " + s.when;
+    document.getElementById("hxTodayTitle").textContent = s.title;
+    document.getElementById("hxTodayWhy").textContent = s.why;
+    document.getElementById("hxTodayList").innerHTML = s.items.map(function(it){
+      return '<li><span class="a">' + escapeHtml(it.a) + '</span>' +
+             (it.b ? '<span class="b">' + escapeHtml(it.b) + '</span>' : '') + '</li>';
+    }).join("");
+
+    document.getElementById("hxRun").textContent  = wk.r;
+    document.getElementById("hxLong").textContent = wk.l;
+    document.getElementById("hxNote").textContent =
+      days < 0 ? "Race done. Log the time, then pick the next one." : (HX_NOTE[wk.p] || "");
+  }
+
+  /* ===== CHINESE — 20-WEEK AUDIO COURSE ===== */
+  /* ISBN 9786160835867 · 70 tracks · 3h01m. Week 1 = Mon 17 Aug 2026, finish Thu 31 Dec 2026. */
+  var ZH_START = "2026-08-17";
+  var ZH_END   = "2026-12-31";
+  var ZH_PLAN = [
+    { k:"pinyin", m:"Pinyin syllables · 14:27" },
+    { k:"new",    m:"Lessons 1–2 · 23:19" },
+    { k:"new",    m:"Lessons 3–4 · 24:01" },
+    { k:"new",    m:"Lessons 5–6 · 19:58" },
+    { k:"new",    m:"Lessons 7–8 · 18:12" },
+    { k:"review", m:"REVIEW Lessons 1–8 · 85:30" },
+    { k:"new",    m:"Lessons 9–10 · 21:01" },
+    { k:"new",    m:"Lessons 11–12 · 9:31" },
+    { k:"new",    m:"Lessons 13–14 · 8:20" },
+    { k:"new",    m:"Lessons 15–16 · 6:56" },
+    { k:"review", m:"REVIEW Lessons 9–16 · 45:48" },
+    { k:"new",    m:"Lessons 17–18 · 9:33" },
+    { k:"new",    m:"Lessons 19–20 · 8:41" },
+    { k:"new",    m:"Lessons 21–22 · 6:43" },
+    { k:"new",    m:"Lessons 23–24 · 7:01" },
+    { k:"review", m:"REVIEW Lessons 17–24 · 31:58" },
+    { k:"final",  m:"Lesson 25 + full pass · 3h 01m" },
+    { k:"final",  m:"Consolidation — shadowing" },
+    { k:"final",  m:"Consolidation — dictation" },
+    { k:"final",  m:"Final review — done by 31 Dec" }
+  ];
+  var ZH_KIND = { pinyin:"Sound week", "new":"New material", review:"Review week", final:"Consolidation" };
+  /* daily task by week kind, indexed Sun..Sat to match Date.getDay() */
+  var ZH_DAILY = {
+    pinyin: ["Dictation test — write pinyin with the tone marks. Under 70%? Run week 1 again.",
+             "The four tones — drill mā má mǎ mà until it's boring",
+             "Initials — listen for b/p, d/t, g/k (breath, not voicing)",
+             "Finals — the vowels, including ü",
+             "The hard pairs — zh/ch/sh vs z/c/s, and j/q/x",
+             "Tone pairs — two-syllable combinations",
+             "Light — just play it in the car, nothing else"],
+    "new":  ["Cold test — both lessons, no book, no warm-up",
+             "Lesson A — meet it. 3× with the book, 3× without. Circle what you miss.",
+             "Lesson A — every exercise track, then shadow the dialogue 5×",
+             "Lesson B — meet it. 3× with the book, 3× without.",
+             "Lesson B — every exercise track, then shadow the dialogue 5×",
+             "Dictation — book shut. Play a line, pause, write the pinyin.",
+             "Light — 20 min on the words you circled. Wrecked? Skip it."],
+    review: ["Cold test the whole block. What fails goes back in the car playlist.",
+             "Cold-test two lessons from the block",
+             "Cold-test two lessons from the block",
+             "Cold-test two lessons from the block",
+             "Cold-test two lessons from the block",
+             "Dictation on the two that went worst",
+             "Light — car listening only"],
+    final:  ["Random cold test — open any track and see if you can follow it",
+             "Full pass — play the course end to end",
+             "Shadow every dialogue, out loud",
+             "Dictation — write what you hear",
+             "Shadow every dialogue, out loud",
+             "Dictation — write what you hear",
+             "Light — car listening only"]
+  };
+  var ZH_NOTE = {
+    pinyin:"Highest-leverage week of the plan, and the one everyone skips. Tones you don't fix now are still wrong at lesson 25.",
+    "new":"Two lessons a week. The Sunday cold test is the only session that can't slip.",
+    review:"No new material this week. Be honest about what actually stuck.",
+    final:"All 25 lessons met. From here it's repetition — and repetition is what makes it stick."
+  };
+
+  function renderZh(){
+    var card = document.getElementById("zhCard");
+    if (!card) return;
+    var start = parseDate(ZH_START), end = parseDate(ZH_END);
+    var days = daysBetween(TODAY, end);
+    var elapsed = daysBetween(start, TODAY);
+    var idx = Math.floor(elapsed / 7), pre = idx < 0;
+    if (idx < 0) idx = 0;
+    if (idx > ZH_PLAN.length - 1) idx = ZH_PLAN.length - 1;
+    var wk = ZH_PLAN[idx];
+
+    document.getElementById("zhCount").innerHTML =
+      Math.abs(days) + '<small>' + (days > 1 ? "days left" : days === 1 ? "day left" : days === 0 ? "DEADLINE" : "days over") + '</small>';
+    document.getElementById("zhSub").innerHTML =
+      "Finish by <b>31 Dec 2026</b><br>25 lessons · 70 tracks · 3h 01m";
+    document.getElementById("zhWeek").textContent =
+      pre ? "Starts " + Math.abs(elapsed) + "d from now" : "Week " + (idx + 1) + " of " + ZH_PLAN.length;
+
+    var kEl = document.getElementById("zhKind");
+    kEl.textContent = ZH_KIND[wk.k] || wk.k;
+    kEl.className = "hx-phase" + (wk.k === "review" ? " cut" : wk.k === "pinyin" ? " peak" : "");
+
+    document.getElementById("zhBarFill").style.width =
+      (pre ? 0 : Math.max(0, Math.min(100, Math.round(((idx + 1) / ZH_PLAN.length) * 100)))) + "%";
+
+    document.getElementById("zhMaterial").textContent = wk.m;
+    var daily = ZH_DAILY[wk.k] || ZH_DAILY["new"];
+    document.getElementById("zhToday").textContent = pre ? "Starts Monday — copy the audio to your phone tonight" : daily[TODAY.getDay()];
+    document.getElementById("zhNote").textContent = days < 0 ? "Deadline passed. Did you finish? Test yourself and find out." : (ZH_NOTE[wk.k] || "");
+  }
+
   /* ===== TIMELINE / SCHEDULE ===== */
   function toggleHabit(id){
     if (habitState[id]) delete habitState[id]; else habitState[id]=1;
@@ -760,7 +1166,7 @@
         { id:"mon-push", type:"gym", checkable:true, label:"🏋 Gym — Push", sub:"chest·shoulders·triceps", split:"Push", start:"18:00", end:"19:30" },
         { id:"mon-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
-        { id:"mon-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:"mon-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:2, tag:"pull night · cardio after lifting", segments:[
@@ -772,7 +1178,7 @@
         { id:"tue-pull", type:"gym", checkable:true, label:"🏋 Gym — Pull", sub:"back·biceps", split:"Pull", start:"18:00", end:"19:30" },
         { id:"tue-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
-        { id:"tue-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:"tue-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:3, tag:"legs night · cardio after lifting", segments:[
@@ -784,7 +1190,7 @@
         { id:"wed-legs", type:"gym", checkable:true, label:"🏋 Gym — Legs", sub:"squat·hinge·calves", split:"Legs", start:"18:00", end:"19:30" },
         { id:"wed-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
-        { id:"wed-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:"wed-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:4, tag:"chest & back night · cardio after lifting", segments:[
@@ -796,7 +1202,7 @@
         { id:"thu-chestback", type:"gym", checkable:true, label:"🏋 Gym — Chest & Back", sub:"chest·back", split:"Chest and Back", start:"18:00", end:"19:30" },
         { id:"thu-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"20:10", end:"20:45" },
-        { id:"thu-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:"thu-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:5, tag:"arms & shoulders night · cardio after lifting", segments:[
@@ -808,7 +1214,7 @@
         { id:"fri-armshoulders", type:"gym", checkable:true, label:"🏋 Gym — Arms & Shoulders", sub:"biceps·triceps·delts", split:"Arms and Shoulders", start:"18:00", end:"19:30" },
         { id:"fri-cardio", type:"cardio", checkable:true, label:"🏃 Run + rope jump", sub:"after lifting", start:"19:30", end:"20:10" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner", sub:"", evening:true, start:"20:10", end:"20:45" },
-        { id:"fri-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
+        { id:"fri-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:45", end:"21:30" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"this one's for you", evening:true, start:"21:30", end:"22:00" }
       ]},
       { dow:6, tag:"heavy work day — no lifting, morning cardio stays", segments:[
@@ -818,7 +1224,7 @@
         { id:uid(), type:"work-heavy", checkable:false, label:"Work · 8:00–18:00", sub:"(tight day — protect this)", start:"07:00", end:"17:00" },
         { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, recover", sub:"recovery comes first", start:"18:00", end:"19:30" },
-        { id:"sat-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"19:30", end:"20:15" },
+        { id:"sat-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"19:30", end:"20:15" },
         { id:uid(), type:"flex", checkable:false, label:"Evening — open", sub:"", start:"20:15", end:"21:00" }
       ]},
       { dow:0, tag:"your only fully free day · morning cardio stays", segments:[
@@ -828,7 +1234,72 @@
         { id:uid(), type:"routine", checkable:false, label:"Meal prep for the week", sub:"", start:"09:00", end:"12:00" },
         { id:uid(), type:"flex", checkable:false, label:"Free time — yours", sub:"", evening:true, start:"12:00", end:"17:00" },
         { id:uid(), type:"routine", checkable:false, label:"Plan next week", sub:"(~15 min) + dinner", start:"17:00", end:"19:00" },
-        { id:"sun-chi", type:"lang", checkable:true, label:"🇨🇳 Chinese", sub:"after dinner · 45 min", start:"19:00", end:"19:45" },
+        { id:"sun-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"19:00", end:"19:45" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening wind-down", sub:"early-ish to bed", start:"19:45", end:"22:00" }
+      ]}
+    ]};
+  }
+
+  /* The 26-week HYROX week: 3 lifting days, 2 morning runs, 1 long Sunday session.
+     Habit ids are deliberately reused from the 5-day split so streaks and history carry over. */
+  function hyroxSchedule(){
+    var commute = function(){ return [
+      { id:uid(), type:"routine", checkable:false, label:"Get ready", sub:"", start:"05:55", end:"07:00" },
+      { id:uid(), type:"routine", checkable:false, label:"Drive", sub:"7:00–8:00", start:"07:00", end:"08:00" },
+      { id:uid(), type:"work", checkable:false, label:"Work", sub:"8:00–17:00", start:"08:00", end:"17:00" },
+      { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" }
+    ]; };
+    function gymDay(dow, tag, engId, gymId, gymLabel, gymSub, split, chiId){
+      return { dow:dow, tag:tag, segments:[
+        { id:engId, type:"lang", checkable:true, label:"English", sub:"10–15 min", start:"05:40", end:"05:55" }
+      ].concat(commute()).concat([
+        { id:gymId, type:"gym", checkable:true, label:gymLabel, sub:gymSub, split:split, start:"18:00", end:"19:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, rest", sub:"", evening:true, start:"19:30", end:"20:15" },
+        { id:chiId, type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"20:15", end:"21:00" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"21:00", end:"21:45" }
+      ])};
+    }
+    /* Runs sit in the same 18:00 slot the gym uses on the other days — one evening habit,
+       not two different wake-up times. English stays at 5:40am like every other weekday. */
+    function runDay(dow, tag, runId, runSub, engId, chiId){
+      return { dow:dow, tag:tag, segments:[
+        { id:engId, type:"lang", checkable:true, label:"English", sub:"10–15 min", start:"05:40", end:"05:55" }
+      ].concat(commute()).concat([
+        { id:runId, type:"cardio", checkable:true, label:"🏃 Run", sub:runSub, start:"18:00", end:"19:00" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, stretch", sub:"legs up for 10 min", evening:true, start:"19:00", end:"19:45" },
+        { id:chiId, type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"19:45", end:"20:30" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — wind-down", sub:"", evening:true, start:"20:30", end:"21:30" }
+      ])};
+    }
+    return { days: [
+      gymDay(1, "gym A — legs & press · squat-led strength", "mon-eng", "mon-push",
+             "🏋 Gym A — Legs & Press", "squat·RDL·lunge·press", "Legs and Press", "mon-chi"),
+      runDay(2, "quality run — the hard session of the week", "tue-cardio",
+             "evening · the hard one", "tue-eng", "tue-chi"),
+      gymDay(3, "gym B — pull & grip · sled pull and farmers carry", "wed-eng", "wed-legs",
+             "🏋 Gym B — Pull & Grip", "deadlift·pull-ups·carries", "Pull and Grip", "wed-chi"),
+      runDay(4, "easy run — conversational, this is recovery", "thu-cardio",
+             "evening · you should be able to talk", "thu-eng", "thu-chi"),
+      gymDay(5, "gym C — HYROX stations · wall balls, lunges, ergs", "fri-eng", "fri-armshoulders",
+             "🏋 Gym C — Stations", "wall balls·lunges·BBJ·erg", "Stations", "fri-chi"),
+      { dow:6, tag:"heavy work day — recovery only, protect this", segments:[
+        { id:"sat-cardio", type:"cardio", checkable:true, label:"☀ Mobility / rope jump", sub:"10 min · optional", start:"05:00", end:"05:15" },
+        { id:uid(), type:"routine", checkable:false, label:"Quiet morning", sub:"coffee", start:"05:15", end:"06:00" },
+        { id:uid(), type:"routine", checkable:false, label:"Drive", sub:"", start:"06:00", end:"07:00" },
+        { id:uid(), type:"work-heavy", checkable:false, label:"Work · 8:00–18:00", sub:"(tight day — protect this)", start:"07:00", end:"17:00" },
+        { id:uid(), type:"routine", checkable:false, label:"Drive home", sub:"", start:"17:00", end:"18:00" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — dinner, recover", sub:"tomorrow is the big one", start:"18:00", end:"19:30" },
+        { id:"sat-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"19:30", end:"20:15" },
+        { id:uid(), type:"flex", checkable:false, label:"Evening — early night", sub:"", start:"20:15", end:"21:00" }
+      ]},
+      { dow:0, tag:"long session — the anchor of the whole plan", segments:[
+        { id:"sun-cardio", type:"cardio", checkable:true, label:"🏁 Long session", sub:"long run · stations · simulations", start:"06:00", end:"08:00" },
+        { id:"sun-eng", type:"lang", checkable:true, label:"English — longer", sub:"practice / shadowing", start:"08:00", end:"08:30" },
+        { id:uid(), type:"routine", checkable:false, label:"Breakfast, refuel properly", sub:"carbs — you just earned them", start:"08:30", end:"09:30" },
+        { id:uid(), type:"routine", checkable:false, label:"Meal prep for the week", sub:"", start:"09:30", end:"12:00" },
+        { id:uid(), type:"flex", checkable:false, label:"Free time — yours", sub:"", evening:true, start:"12:00", end:"17:00" },
+        { id:uid(), type:"routine", checkable:false, label:"Plan next week", sub:"(~15 min) + dinner", start:"17:00", end:"19:00" },
+        { id:"sun-chi", type:"lang", checkable:true, label:"中 Chinese", sub:"after dinner · 45 min", start:"19:00", end:"19:45" },
         { id:uid(), type:"flex", checkable:false, label:"Evening wind-down", sub:"early-ish to bed", start:"19:45", end:"22:00" }
       ]}
     ]};
@@ -836,10 +1307,23 @@
 
   var schedule = get(K_SCHEDULE, null);
   if (!schedule || !schedule.days || !schedule.days.length) schedule = defaultSchedule();
+
+  /* Auto-load the HYROX training week — ONCE, on the first visit inside the race build.
+     After that K_HYROX_AUTO is set and this never fires again, so schedule edits stick.
+     The previous schedule is stashed at K_SCHEDULE_PRE so "Undo" has something to restore. */
+  (function(){
+    if (get(K_HYROX_AUTO, false)) return;
+    var t = TODAY.getTime();
+    if (t < parseDate(HX_START).getTime() || t > parseDate(HX_RACE).getTime()) return;
+    set(K_SCHEDULE_PRE, schedule);
+    schedule = hyroxSchedule();
+    set(K_HYROX_AUTO, true);
+    set(K_HYROX_NOTICE, true);
+  })();
+
   function saveSchedule(){
     schedule.days.forEach(function(d){ d.segments.sort(function(a,b){ return toMin(a.start)-toMin(b.start); }); });
     set(K_SCHEDULE, schedule);
-    if (typeof gcalOnScheduleSaved === "function") gcalOnScheduleSaved();
   }
   saveSchedule();
 
@@ -984,9 +1468,35 @@
     if (schedEditMode) renderScheduleEdit(); else renderAll();
     renderLegend();
   });
+  /* The auto-load is silent otherwise — say so, and offer a way straight back.
+     Stays up across reloads until it's undone or dismissed, so the Undo can't be missed. */
+  var hxNotice = document.getElementById("hxNotice");
+  function hxCloseNotice(){ set(K_HYROX_NOTICE, false); hxNotice.style.display = "none"; }
+  if (get(K_HYROX_NOTICE, false)) hxNotice.style.display = "block";
+  document.getElementById("hxUndo").addEventListener("click", function(){
+    var prev = get(K_SCHEDULE_PRE, null);
+    if (!prev || !prev.days || !prev.days.length) { alert("No previous schedule was saved."); return; }
+    schedule = prev;
+    saveSchedule();                                   // K_HYROX_AUTO stays set, so it won't swap back
+    hxCloseNotice();
+    if (schedEditMode) renderScheduleEdit();
+    renderAll();
+  });
+  document.getElementById("hxKeep").addEventListener("click", hxCloseNotice);
+
   document.getElementById("schedResetDefault").addEventListener("click", function(){
     if (!confirm("Replace your current schedule with the built-in default? This can't be undone.")) return;
     schedule = defaultSchedule();
+    set(K_HYROX_AUTO, true);   // deliberate choice — don't let the auto-load put HYROX back
+    saveSchedule();
+    if (schedEditMode) renderScheduleEdit();
+    renderAll();
+  });
+  document.getElementById("schedHyrox").addEventListener("click", function(){
+    if (!confirm("Load the 26-week HYROX training week?\n\nMon / Wed / Fri — Gym A, B, C\nTue / Thu — evening runs\nSat — recovery only\nSun 6am — long session\n\nThis replaces your current schedule. Back up your data first if you want a way back.")) return;
+    set(K_SCHEDULE_PRE, schedule);
+    schedule = hyroxSchedule();
+    set(K_HYROX_AUTO, true);
     saveSchedule();
     if (schedEditMode) renderScheduleEdit();
     renderAll();
@@ -1037,12 +1547,12 @@
   function progressRing(pct){
     var size=84, stroke=9, r=(size-stroke)/2, c=size/2, circ=2*Math.PI*r;
     var off=circ*(1-pct/100);
-    var color = pct>=70?"#8fa888":pct>=40?"#d4a24e":pct>0?"#d68f6a":"rgba(243,237,225,0.18)";
+    var color = pct>=70?"#7FB069":pct>=40?"#D9A441":pct>0?"#E08A5B":"#262A31";
     return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'
-      +'<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="rgba(243,237,225,0.10)" stroke-width="'+stroke+'"/>'
+      +'<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="var(--bg-raise)" stroke-width="'+stroke+'"/>'
       +'<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+stroke+'" stroke-linecap="round" '
       +'stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 '+c+' '+c+')"/>'
-      +'<text x="'+c+'" y="'+(c+5)+'" text-anchor="middle" font-size="17" font-family="Fraunces" font-weight="600" fill="#f3ede1">'+pct+'%</text>'
+      +'<text x="'+c+'" y="'+(c+5)+'" text-anchor="middle" font-size="17" font-family="Fraunces" font-weight="600" fill="var(--ink)">'+pct+'%</text>'
       +'</svg>';
   }
   function yearPaceText(pct){
@@ -1312,6 +1822,262 @@
     habitState={}; saveHabits(); recordWeek(); renderAll();
   });
 
+  /* ===== GENERATIVE GRAPHICS =====
+     Three pieces, all drawn from scratch on every load:
+       1. bgField()    — a flow-field that paints itself over ~15s, then stops. New every load.
+       2. renderDayBanner() — today's strip, seeded by the date, lit by what you've ticked off.
+       3. renderConsist()   — year grid + sparklines, read from the saved weekly history. */
+
+  var REDUCED = false;
+  try { REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){}
+
+  /* seeded PRNG so a given seed always paints the same picture */
+  function mulberry(seed){
+    return function(){
+      seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  /* smooth 2D value noise built on that PRNG */
+  function noiseField(rand){
+    var vals = new Float32Array(256), perm = new Uint8Array(256), i, j, t;
+    for (i=0;i<256;i++){ vals[i] = rand(); perm[i] = i; }
+    for (i=255;i>0;i--){ j = (rand()*(i+1))|0; t = perm[i]; perm[i] = perm[j]; perm[j] = t; }
+    function g(a,b){ return vals[ perm[ (a + perm[b & 255]) & 255 ] ]; }
+    return function(x,y){
+      var xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+      var u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf);
+      var a = g(xi,yi), b = g(xi+1,yi), c = g(xi,yi+1), d = g(xi+1,yi+1);
+      return (a*(1-u)+b*u)*(1-v) + (c*(1-u)+d*u)*v;
+    };
+  }
+
+  /* ---- 1. living background ---- */
+  var bgRAF = null, bgTimer = null;
+  function bgField(){
+    var cv = document.getElementById("bgCanvas");
+    if (!cv || !cv.getContext) return;
+    if (bgRAF){ cancelAnimationFrame(bgRAF); bgRAF = null; }
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+
+    var rand = mulberry((Date.now() ^ (Math.random()*1e9)) | 0);
+    var noise = noiseField(rand);
+    var COUNT = Math.max(90, Math.min(320, Math.round(W*H/5200)));
+    var SCALE = 0.0020 + rand()*0.0011;
+    var STEP  = 1.15;
+    var p = [];
+    for (var i=0;i<COUNT;i++){
+      p.push({ x: rand()*W, y: rand()*H, life: 120 + rand()*420, warm: rand() < 0.13 });
+    }
+    ctx.lineCap = "round";
+
+    function step(){
+      for (var i=0;i<p.length;i++){
+        var q = p[i];
+        var a = noise(q.x*SCALE, q.y*SCALE) * Math.PI * 4;
+        var nx = q.x + Math.cos(a)*STEP, ny = q.y + Math.sin(a)*STEP;
+        ctx.strokeStyle = q.warm ? "rgba(217,164,65,0.055)" : "rgba(232,234,237,0.038)";
+        ctx.lineWidth = q.warm ? 0.9 : 0.7;
+        ctx.beginPath(); ctx.moveTo(q.x,q.y); ctx.lineTo(nx,ny); ctx.stroke();
+        q.x = nx; q.y = ny; q.life--;
+        if (q.life <= 0 || nx < -40 || nx > W+40 || ny < -40 || ny > H+40){
+          q.x = rand()*W; q.y = rand()*H; q.life = 120 + rand()*420;
+        }
+      }
+    }
+
+    if (REDUCED){                       // no animation: paint the finished picture at once
+      for (var f=0; f<520; f++) step();
+      return;
+    }
+    var frames = 0, MAX = 620;          // ~10s, then it settles and costs nothing
+    (function loop(){
+      step(); frames++;
+      if (frames < MAX) bgRAF = requestAnimationFrame(loop);
+      else bgRAF = null;
+    })();
+  }
+  window.addEventListener("resize", function(){
+    clearTimeout(bgTimer);
+    bgTimer = setTimeout(function(){ bgField(); renderDayBanner(); }, 260);
+  });
+
+  /* ---- 2. today's banner ---- */
+  function renderDayBanner(){
+    var cv = document.getElementById("dayBanner"), cap = document.getElementById("dbCap");
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+
+    /* today's checkable anchors */
+    var todayEl = document.querySelector('.day[data-day="'+TODAY.getDay()+'"]');
+    var list = todayEl ? Array.prototype.slice.call(todayEl.querySelectorAll(".seg.checkable")) : [];
+    var total = list.length;
+    var done = list.filter(function(s){ return !!habitState[s.getAttribute("data-habit")]; }).length;
+    var ratio = total ? done/total : 0;
+
+    /* stable for the whole day, different every day */
+    var seed = TODAY.getFullYear()*10000 + (TODAY.getMonth()+1)*100 + TODAY.getDate();
+    var rand = mulberry(seed);
+    var noise = noiseField(rand);
+
+    var GAP = 3, N = Math.max(24, Math.floor(W/GAP));
+    var lit = Math.round(N*ratio);
+    for (var i=0;i<N;i++){
+      var x = (i+0.5)*(W/N);
+      var n = noise(i*0.075, 0.5) * 0.72 + noise(i*0.24, 3.1) * 0.28;
+      var h = 5 + n*(H-13);
+      var y = (H-h)/2;
+      if (i < lit){
+        ctx.fillStyle = "rgba(217,164,65," + (0.42 + n*0.5).toFixed(3) + ")";
+      } else {
+        ctx.fillStyle = "rgba(232,234,237," + (0.085 + n*0.10).toFixed(3) + ")";
+      }
+      ctx.fillRect(x-0.9, y, 1.8, h);
+    }
+    /* the boundary between done and not-done */
+    if (lit > 0 && lit < N){
+      var bx = lit*(W/N);
+      ctx.fillStyle = "rgba(217,164,65,0.75)";
+      ctx.fillRect(bx-0.5, 4, 1, H-8);
+    }
+    if (cap){
+      cap.innerHTML = total
+        ? DOW[TODAY.getDay()] + ' &middot; <b>' + done + '/' + total + '</b>'
+        : DOW[TODAY.getDay()];
+    }
+  }
+
+  /* ---- 3. graphics made from your history ---- */
+  /* ISO years run 52 or 53 weeks — 2026 is a 53-week year, so don't hardcode 52 */
+  function isoWeeksInYear(y){
+    function thuOf(d){ var n=new Date(d.getTime()); n.setUTCDate(n.getUTCDate() - ((n.getUTCDay()+6)%7) + 3); return n; }
+    var lastThu = thuOf(new Date(Date.UTC(y,11,28)));
+    var firstThu = thuOf(new Date(Date.UTC(y,0,4)));
+    return 1 + Math.round((lastThu - firstThu)/(7*86400000));
+  }
+  function heatColor(v){
+    if (!v && v !== 0) return "#1A1D22";
+    if (v <= 0)  return "#1A1D22";
+    if (v < 25)  return "#2E3A2C";
+    if (v < 50)  return "#3F5638";
+    if (v < 75)  return "#5A7F4B";
+    if (v < 95)  return "#7FB069";
+    return "#9BCB80";
+  }
+  function sparkline(vals, max, color){
+    if (!vals.length) return "";
+    var W = 200, H = 38, pad = 3;
+    var n = vals.length, step = n > 1 ? (W - pad*2)/(n-1) : 0;
+    var pt = vals.map(function(v,i){
+      var x = pad + i*step;
+      var y = H - pad - (max ? (v/max) : 0)*(H - pad*2);
+      return [x, y];
+    });
+    var line = pt.map(function(p){ return p[0].toFixed(1)+","+p[1].toFixed(1); }).join(" ");
+    var area = line + " " + (pad+(n-1)*step).toFixed(1) + "," + (H-pad) + " " + pad + "," + (H-pad);
+    var last = pt[n-1];
+    var id = "g" + Math.random().toString(36).slice(2,7);
+    return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img">'
+      + '<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="'+color+'" stop-opacity="0.30"/>'
+      + '<stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'
+      + '<polygon points="'+area+'" fill="url(#'+id+')"/>'
+      + '<polyline points="'+line+'" fill="none" stroke="'+color+'" stroke-width="1.6" '
+      + 'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+      + '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.6" fill="'+color+'"/>'
+      + '</svg>';
+  }
+  function renderConsist(){
+    var wrap = document.getElementById("cnYearWrap");
+    if (!wrap) return;
+    var sub = document.getElementById("cnSub"),
+        scale = document.getElementById("cnScale"),
+        sparks = document.getElementById("cnSparks");
+    var year = TODAY.getFullYear();
+    var keys = Object.keys(history).sort();
+
+    if (!keys.length){
+      sub.textContent = "";
+      wrap.innerHTML = '<p class="cn-empty">Nothing to draw yet. These graphics build themselves from your weekly history &mdash; tick a few anchors and the first cells light up on Monday.</p>';
+      scale.innerHTML = ""; sparks.innerHTML = "";
+      return;
+    }
+
+    /* --- year grid: every ISO week of this year, 2 rows.
+           Careful: ISO years have 52 or 53 weeks (2026 has 53). --- */
+    var NWEEKS = isoWeeksInYear(year);
+    var COLS = NWEEKS, ROWS = 1, CELL = 15, GAPC = 3.4;   // one continuous strip — months line up
+    var GW = COLS*CELL + (COLS-1)*GAPC, GH = ROWS*CELL + 15;
+    var thisWeek = parseInt(WK.split("-W")[1], 10);
+    var cells = "", filled = 0, sum = 0;
+    for (var w=1; w<=NWEEKS; w++){
+      var k = year + "-W" + (w<10?"0"+w:""+w);
+      var rec = history[k];
+      var v = rec ? (rec.pct||0) : null;
+      if (rec){ filled++; sum += (rec.pct||0); }
+      var idx = w-1, r = Math.floor(idx/COLS), c = idx%COLS;
+      var x = c*(CELL+GAPC), y = r*(CELL+GAPC);
+      cells += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+CELL+'" height="'+CELL+'" rx="2.5" '
+             + 'fill="'+heatColor(v)+'"'
+             + (w===thisWeek ? ' stroke="#D9A441" stroke-width="1.4"' : '')
+             + '><title>Week '+w+(rec ? ' — '+(rec.pct||0)+'%' : ' — no data')+'</title></rect>';
+    }
+    /* month ticks beneath the strip, at the ISO week each month begins */
+    var labels = "";
+    ["Jan","Mar","May","Jul","Sep","Nov"].forEach(function(name, i){
+      var wk = Math.round(i*2*(NWEEKS/12)) + 1;
+      if (wk > NWEEKS) return;
+      labels += '<text x="'+(((wk-1)*(CELL+GAPC))).toFixed(1)+'" y="'+(GH-2.5)+'" font-size="9.5" fill="#61666E" font-family="Inter">'+name+'</text>';
+    });
+    wrap.innerHTML = '<svg class="cn-year" viewBox="0 0 '+GW.toFixed(1)+' '+GH.toFixed(1)+'" preserveAspectRatio="xMinYMin meet" role="img" '
+      + 'aria-label="Weekly consistency across '+year+'">'+cells+labels+'</svg>';
+
+    sub.textContent = filled
+      ? filled + (filled===1?" week":" weeks") + " logged in " + year
+        + " · " + Math.round(sum/filled) + "% average · each cell is one week"
+      : "No weeks logged in " + year + " yet · each cell is one week";
+
+    scale.innerHTML = '<span>less</span>'
+      + ["#1A1D22","#2E3A2C","#3F5638","#5A7F4B","#7FB069","#9BCB80"].map(function(c){
+          return '<i style="background:'+c+'"></i>'; }).join("")
+      + '<span>more</span>';
+
+    /* --- sparklines: last 12 weeks per activity --- */
+    var recent = keys.slice(-12).map(function(k){ return history[k]||{}; });
+    var defs = [
+      { name:"Cardio",  key:"cardio", color:"#E08A5B", streak: streakOf(function(h){ return (h.cardio||0)>=4; }) },
+      { name:"Lifting", key:"gym",    color:"#7FB069", streak: streakOf(function(h){ return (h.gym||0)>=3; }) },
+      { name:"Language",key:"eng",    color:"#D9A441", streak: streakOf(function(h){ return (h.eng||0)>=3; }) },
+      { name:"Overall", key:"pct",    color:"#5E82AB", streak: streakOf(function(h){ return (h.pct||0)>=60; }) }
+    ];
+    sparks.innerHTML = defs.map(function(d){
+      var vals = recent.map(function(h){ return h[d.key]||0; });
+      var max = Math.max.apply(null, vals.concat([1]));
+      var latest = vals[vals.length-1] || 0;
+      return '<div class="cn-spark">'
+        + '<div class="sp-top"><span class="sp-name">'+d.name+'</span>'
+        + '<span class="sp-val" style="color:'+d.color+'">'+d.streak+'<small>wk streak</small></span></div>'
+        + sparkline(vals, max, d.color)
+        + '<span class="sp-name" style="color:var(--ink-faint);letter-spacing:.3px;text-transform:none;font-weight:400">'
+        + (d.key==="pct" ? "latest "+latest+"%" : "latest "+latest+" this week") + ' · last '+vals.length+' weeks</span>'
+        + '</div>';
+    }).join("");
+  }
+
   /* ===== REVIEW + TREND ===== */
   var reviewEl=document.getElementById("review");
   if(todayDow===0) reviewEl.open=true;
@@ -1328,16 +2094,16 @@
     var keys=Object.keys(history).sort().slice(-8);
     var svg=document.getElementById("trendSvg"), cap=document.getElementById("trendCap");
     if(keys.length<2){
-      svg.innerHTML='<text x="14" y="40" fill="#b9c0d4" font-size="11" font-family="Inter">Trend appears after a couple of weeks.</text>';
+      svg.innerHTML='<text x="14" y="40" fill="#8B9099" font-size="11" font-family="Inter">Trend appears after a couple of weeks.</text>';
       cap.textContent="Each point = % of anchors you hit that week. Watch the line, not the day."; return;
     }
     var W=280,H=70,pad=10,n=keys.length,step=(W-pad*2)/(n-1);
     var pts=keys.map(function(k,i){ var v=history[k].pct||0; return [pad+i*step, H-pad-(v/100)*(H-pad*2)]; });
-    var dots=pts.map(function(p){ return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="#d4a24e"/>'; }).join("");
-    svg.innerHTML='<polyline fill="none" stroke="#8fa888" stroke-width="2" points="'+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ")+'"/>'+dots;
+    var dots=pts.map(function(p){ return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="#D9A441"/>'; }).join("");
+    svg.innerHTML='<polyline fill="none" stroke="#7FB069" stroke-width="2" points="'+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ")+'"/>'+dots;
     var last=history[keys[n-1]].pct||0, prev=history[keys[n-2]].pct||0;
     var dir=last>prev?"up from last week — keep it":last<prev?"down from last week — reset, don't spiral":"steady with last week";
-    cap.innerHTML="Last "+n+" weeks of anchor consistency.<br>You're <b style='color:#f3ede1'>"+last+"%</b> this week, "+dir+".";
+    cap.innerHTML="Last "+n+" weeks of anchor consistency.<br>You're <b style='color:var(--ink)'>"+last+"%</b> this week, "+dir+".";
   }
 
   /* ===== PROGRESS REPORTS ===== */
@@ -1354,7 +2120,7 @@
       var p=k.split("-W"); return { key:k, d:isoWeekStart(+p[0], +p[1]), h:history[k]||{} };
     });
   }
-  function colorFor(v){ return v>=70?"#8fa888":v>=40?"#d4a24e":v>0?"#d68f6a":"rgba(243,237,225,0.10)"; }
+  function colorFor(v){ return v>=70?"#7FB069":v>=40?"#D9A441":v>0?"#E08A5B":"#1E2126"; }
 
   function barChart(items){
     if(!items.length) return '<div class="rep-empty">No data yet for this period — it fills in as you complete weeks.</div>';
@@ -1363,11 +2129,11 @@
     var bars=items.map(function(it,i){
       var x=18+i*step, h=Math.max(2,(it.v/100)*(base-top)), y=base-h, cx=x+bw/2;
       return '<rect x="'+x+'" y="'+y.toFixed(1)+'" width="'+bw+'" height="'+h.toFixed(1)+'" rx="4" fill="'+colorFor(it.v)+'"/>'
-        +'<text x="'+cx+'" y="'+(y-5).toFixed(1)+'" text-anchor="middle" font-size="10" fill="#b9c0d4" font-family="Inter">'+(it.v?it.v+'%':'')+'</text>'
-        +'<text x="'+cx+'" y="'+(H-7)+'" text-anchor="middle" font-size="10" fill="#b9c0d4" font-family="Inter">'+it.label+'</text>';
+        +'<text x="'+cx+'" y="'+(y-5).toFixed(1)+'" text-anchor="middle" font-size="10" fill="#8B9099" font-family="Inter">'+(it.v?it.v+'%':'')+'</text>'
+        +'<text x="'+cx+'" y="'+(H-7)+'" text-anchor="middle" font-size="10" fill="#8B9099" font-family="Inter">'+it.label+'</text>';
     }).join("");
     return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="xMinYMid meet">'
-      +'<line x1="14" y1="'+base+'" x2="'+(W-6)+'" y2="'+base+'" stroke="rgba(243,237,225,0.12)"/>'+bars+'</svg>';
+      +'<line x1="14" y1="'+base+'" x2="'+(W-6)+'" y2="'+base+'" stroke="var(--rule)"/>'+bars+'</svg>';
   }
   function tile(cls,num,lab){ return '<div class="tile '+cls+'"><div class="t-num">'+num+'</div><div class="t-lab">'+lab+'</div></div>'; }
 
@@ -1415,192 +2181,11 @@
 
   /* ===== RENDER ===== */
   function renderHabitSegs(){ segs.forEach(function(seg){ seg.classList.toggle("done", !!habitState[seg.getAttribute("data-habit")]); }); }
-  function renderAll(){ renderTimeline(); renderHabitSegs(); renderChallenge(); renderGoals(); renderProjects(); renderMini(); renderToday(); renderEveningHints(); renderProgress(); renderTrend(); renderReports(); }
+  function renderAll(){ renderTimeline(); renderHabitSegs(); renderChallenge(); renderHyrox(); renderZh(); renderGoals(); renderProjects(); renderMini(); renderToday(); renderEveningHints(); renderProgress(); renderTrend(); renderReports(); renderDayBanner(); renderConsist(); }
 
-  /* ===== GOOGLE CALENDAR SYNC =====
-     Mirrors your weekly schedule into a dedicated "YourWeek Planner" Google
-     Calendar as recurring weekly events. Idempotent: each block carries a
-     private tag (yourweekSegId) so re-syncing updates/removes rather than
-     duplicating, and it reconciles from the calendar itself so it works the
-     same on your phone and laptop. Google's libraries load only when you
-     click Connect, so the app stays fully offline otherwise. */
-  var GCAL_CLIENT_ID = "1089914306473-l1irl2tgt9hjb0uqfg00l8c6paargq0q.apps.googleusercontent.com";  // <-- from Google Cloud (OAuth client ID)
-  var GCAL_CAL_NAME  = "YourWeek Planner";
-  var GCAL_TZ = (Intl && Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
-  var gcalInited = false, gcalConnected = false, gcalTokenClient = null;
-  var gcalAuto = localStorage.getItem("yourweek:gcal:auto") === "1";
-  var gcalAutoTimer = null;
-
-  function gcalStatus(msg){ var el=document.getElementById("gcalStatus"); if(el) el.textContent = msg||""; }
-  function gcalPad(n){ return (n<10?"0":"")+n; }
-  function gcalConfigured(){ return GCAL_CLIENT_ID && GCAL_CLIENT_ID.indexOf("PASTE_") !== 0; }
-
-  function gcalLoadScript(src){
-    return new Promise(function(res,rej){
-      var s=document.createElement("script"); s.src=src; s.async=true;
-      s.onload=res; s.onerror=function(){ rej(new Error("Could not load "+src+" (are you online?)")); };
-      document.head.appendChild(s);
-    });
-  }
-  async function gcalEnsureLibs(){
-    if(!window.gapi) await gcalLoadScript("https://apis.google.com/js/api.js");
-    await new Promise(function(res){ gapi.load("client", res); });
-    if(!gcalInited){
-      await gapi.client.init({ discoveryDocs:["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"] });
-      gcalInited = true;
-    }
-    if(!window.google || !google.accounts) await gcalLoadScript("https://accounts.google.com/gsi/client");
-  }
-  function gcalAuth(interactive){
-    return new Promise(function(res,rej){
-      if(!gcalTokenClient){
-        gcalTokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: GCAL_CLIENT_ID,
-          scope: "https://www.googleapis.com/auth/calendar",
-          callback: function(resp){
-            if(resp && resp.error){ rej(resp); return; }
-            gapi.client.setToken({ access_token: resp.access_token });
-            gcalConnected = true; res(resp);
-          }
-        });
-      }
-      gcalTokenClient.callback = function(resp){
-        if(resp && resp.error){ rej(resp); return; }
-        gapi.client.setToken({ access_token: resp.access_token });
-        gcalConnected = true; res(resp);
-      };
-      gcalTokenClient.requestAccessToken({ prompt: interactive ? "consent" : "" });
-    });
-  }
-  async function gcalEnsureCalendar(){
-    var list = await gapi.client.calendar.calendarList.list({ maxResults: 250 });
-    var found = (list.result.items||[]).filter(function(c){ return c.summary === GCAL_CAL_NAME; })[0];
-    if(found){ localStorage.setItem("yourweek:gcal:calId", found.id); return found.id; }
-    var created = await gapi.client.calendar.calendars.insert({ resource:{ summary: GCAL_CAL_NAME, timeZone: GCAL_TZ } });
-    localStorage.setItem("yourweek:gcal:calId", created.result.id);
-    return created.result.id;
-  }
-  function gcalNextDateForDow(dow){
-    var d = new Date(); d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + ((dow - d.getDay() + 7) % 7));
-    return d;
-  }
-  function gcalLocalISO(dateObj, hhmm){
-    var p=(hhmm||"00:00").split(":"), d=new Date(dateObj);
-    d.setHours(+p[0]||0, +p[1]||0, 0, 0);
-    return d.getFullYear()+"-"+gcalPad(d.getMonth()+1)+"-"+gcalPad(d.getDate())+
-           "T"+gcalPad(d.getHours())+":"+gcalPad(d.getMinutes())+":00";
-  }
-  function gcalSegEvent(dow, seg){
-    var base = gcalNextDateForDow(dow);
-    var endMin = Math.max(toMin(seg.start)+5, toMin(seg.end));
-    var endHH = gcalPad(Math.floor(endMin/60))+":"+gcalPad(endMin%60);
-    return {
-      summary: seg.label || "(untitled)",
-      description: (seg.sub ? seg.sub+"\n" : "") + "— from your YourWeek planner",
-      start: { dateTime: gcalLocalISO(base, seg.start), timeZone: GCAL_TZ },
-      end:   { dateTime: gcalLocalISO(base, endHH),     timeZone: GCAL_TZ },
-      recurrence: ["RRULE:FREQ=WEEKLY"],
-      extendedProperties: { private: { yourweekSegId: seg.id } },
-      reminders: { useDefault:false, overrides: seg.checkable ? [{ method:"popup", minutes:10 }] : [] }
-    };
-  }
-  async function gcalSync(interactive){
-    if(!gcalConfigured()){ gcalStatus("Not set up yet — paste your Client ID (see setup)."); return; }
-    gcalStatus("Connecting…");
-    await gcalEnsureLibs();
-    if(!gapi.client.getToken()) await gcalAuth(interactive);
-
-    var calId = await gcalEnsureCalendar();
-    gcalStatus("Reading your calendar…");
-    var existing = {}, pageToken;
-    do {
-      var r = await gapi.client.calendar.events.list({
-        calendarId: calId, singleEvents:false, showDeleted:false, maxResults:2500, pageToken: pageToken
-      });
-      (r.result.items||[]).forEach(function(ev){
-        var sid = ev.extendedProperties && ev.extendedProperties.private && ev.extendedProperties.private.yourweekSegId;
-        if(sid && ev.status !== "cancelled") existing[sid] = ev.id;
-      });
-      pageToken = r.result.nextPageToken;
-    } while(pageToken);
-
-    var current = {}, todo = [];
-    schedule.days.forEach(function(d){
-      d.segments.forEach(function(seg){
-        if(!seg.checkable) return;   // only sync check-list tasks (gym, cardio, English, Chinese)
-        current[seg.id] = true;
-        var body = gcalSegEvent(d.dow, seg);
-        if(existing[seg.id]) todo.push({ op:"update", id:existing[seg.id], body:body });
-        else todo.push({ op:"insert", body:body });
-      });
-    });
-    Object.keys(existing).forEach(function(sid){
-      if(!current[sid]) todo.push({ op:"delete", id:existing[sid] });
-    });
-
-    var done = 0;
-    for(var i=0;i<todo.length;i++){
-      var t = todo[i];
-      gcalStatus("Syncing… "+(done+1)+"/"+todo.length);
-      if(t.op==="insert") await gapi.client.calendar.events.insert({ calendarId:calId, resource:t.body });
-      else if(t.op==="update") await gapi.client.calendar.events.update({ calendarId:calId, eventId:t.id, resource:t.body });
-      else await gapi.client.calendar.events.delete({ calendarId:calId, eventId:t.id });
-      done++;
-    }
-    localStorage.setItem("yourweek:gcal:lastSync", new Date().toISOString());
-    gcalStatus("✓ Synced "+Object.keys(current).length+" blocks · "+new Date().toLocaleTimeString());
-    gcalReflectUI();
-  }
-  function gcalReflectUI(){
-    var c=document.getElementById("gcalConnect"), s=document.getElementById("gcalSync"), w=document.getElementById("gcalAutoWrap");
-    if(gcalConnected){
-      if(c) c.style.display="none";
-      if(s) s.style.display="";
-      if(w) w.style.display="";
-    }
-  }
-  function gcalErr(e){
-    var m = (e && e.result && e.result.error && e.result.error.message) || (e && e.message) || (e && e.error) || "Sync failed";
-    gcalStatus("⚠ "+m);
-    console.error("[gcal]", e);
-  }
-  // called from saveSchedule() when the routine changes
-  function gcalOnScheduleSaved(){
-    if(!gcalAuto || !gcalConnected) return;
-    clearTimeout(gcalAutoTimer);
-    gcalAutoTimer = setTimeout(function(){ gcalSync(false).catch(gcalErr); }, 1500);
-  }
-
-  (function gcalWireUI(){
-    var connect=document.getElementById("gcalConnect"),
-        sync=document.getElementById("gcalSync"),
-        auto=document.getElementById("gcalAuto");
-    if(!connect) return;
-    if(!gcalConfigured()){
-      gcalStatus("Setup needed — add your Google Client ID to enable sync.");
-    } else {
-      var last = localStorage.getItem("yourweek:gcal:lastSync");
-      gcalStatus(last ? "Last synced "+new Date(last).toLocaleString()+" — click Connect to sync." : "Not connected yet.");
-    }
-    connect.addEventListener("click", function(){
-      gcalSync(true).catch(gcalErr);
-    });
-    sync.addEventListener("click", function(){
-      gcalSync(false).catch(function(e){
-        // token likely expired → re-prompt
-        gcalSync(true).catch(gcalErr);
-      });
-    });
-    if(auto){
-      auto.checked = gcalAuto;
-      auto.addEventListener("change", function(){
-        gcalAuto = auto.checked;
-        localStorage.setItem("yourweek:gcal:auto", gcalAuto ? "1" : "0");
-        if(gcalAuto && gcalConnected) gcalOnScheduleSaved();
-      });
-    }
-  })();
+  /* Google Calendar sync was removed on 2026-08-27 (planner is offline-only again).
+     Clear anything the old sync left in storage so backups stay clean. */
+  ["yourweek:gcal:calId","yourweek:gcal:auto","yourweek:gcal:lastSync"].forEach(function(k){ localStorage.removeItem(k); });
 
   /* ===== BACKUP / RESTORE =====
      Planner data is stored in localStorage, which is scoped per site address.
@@ -1647,6 +2232,7 @@
   recordWeek();
   renderAll();
   renderLegend();
+  bgField();          // paints itself over ~10s, then stops
 })();
 </script>
 </body>
